@@ -21,6 +21,44 @@
       </noscript>
     </div>
 
+    <!--
+      Scheitert der Start, bleibt sonst nur der Ladehinweis stehen und niemand
+      erfährt, woran es lag. Dieser Melder steht bewusst vor dem Spiel-Bündel:
+      So fängt er auch einen Syntaxfehler ab, bei dem das Bündel selbst gar
+      nicht erst ausgeführt wird. Die Gestaltung liegt inline, weil in so einem
+      Fall auch das Stylesheet fehlen kann.
+    -->
+    <script>
+      (function () {
+        var gemeldet = false;
+        function zeigeFehler(text) {
+          if (gemeldet) return;
+          gemeldet = true;
+          var ziel = document.getElementById('boot');
+          if (!ziel) return;
+          ziel.textContent = '';
+          var titel = document.createElement('p');
+          titel.textContent = 'Das Spiel konnte nicht starten.';
+          titel.style.cssText = 'font:600 16px/1.5 system-ui,sans-serif;margin:0 0 .75rem';
+          var kasten = document.createElement('pre');
+          kasten.textContent = text;
+          kasten.style.cssText =
+            'white-space:pre-wrap;word-break:break-word;max-width:34rem;margin:0 auto;' +
+            'padding:.75rem;border:1px solid currentColor;border-radius:8px;text-align:left;' +
+            'font:12px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace';
+          ziel.appendChild(titel);
+          ziel.appendChild(kasten);
+        }
+        window.addEventListener('error', function (e) {
+          zeigeFehler((e.message || 'Unbekannter Fehler') + '\n' + (e.filename || '') + ':' + (e.lineno || '?'));
+        });
+        window.addEventListener('unhandledrejection', function (e) {
+          var grund = e.reason;
+          zeigeFehler('Unbehandelte Zusage: ' + ((grund && grund.message) || grund));
+        });
+      })();
+    </script>
+
     <div id="app" class="app" hidden></div>
     <div id="modal-root" class="modal-root"></div>
     <div id="toast-root" class="toast-root" aria-live="polite" aria-atomic="false"></div>
