@@ -412,11 +412,10 @@ function main() {
   }
 
   const minifiedCSS = minifyCSS(css);
-  const minifiedJS = minifyJS(bundle);
 
   const output = html
     .replace('</head>', `  <style>\n${minifiedCSS}\n  </style>\n</head>`)
-    .replace(scriptRe, `  <script>\n${minifiedJS}\n  </script>\n`);
+    .replace(scriptRe, `  <script>\n${bundle}\n  </script>\n`);
 
   mkdirSync(OUT_DIR, { recursive: true });
   writeFileSync(OUT_FILE, output, 'utf8');
