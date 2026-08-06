@@ -285,12 +285,109 @@ function buildBundle(modules) {
   return parts.join('\n');
 }
 
+/** Entfernt Kommentare und überflüssige Leerzeichen aus JavaScript. */
+function minifyJS(code) {
+  let result = '';
+  let i = 0;
+  let inString = false;
+  let inTemplate = false;
+  let stringChar = '';
+
+  while (i < code.length) {
+    const char = code[i];
+    const next = code[i + 1];
+
+    // Template-Literal verfolgen
+    if (char === '`' && (i === 0 || code[i - 1] !== '\\')) {
+      inTemplate = !inTemplate;
+      result += char;
+      i += 1;
+      continue;
+    }
+
+    if (inTemplate) {
+      result += char;
+      i += 1;
+      continue;
+    }
+
+    // String-Zustand verfolgen
+    if ((char === '"' || char === "'" || char === '`') && (i === 0 || code[i - 1] !== '\\')) {
+      if (!inString) {
+        inString = true;
+        stringChar = char;
+      } else if (char === stringChar) {
+        inString = false;
+      }
+      result += char;
+      i += 1;
+      continue;
+    }
+
+    if (inString) {
+      result += char;
+      i += 1;
+      continue;
+    }
+
+    // Einzeilige Kommentare
+    if (char === '/' && next === '/') {
+      while (i < code.length && code[i] !== '\n') i += 1;
+      continue;
+    }
+
+    // Mehrzeilige Kommentare
+    if (char === '/' && next === '*') {
+      i += 2;
+      while (i < code.length - 1) {
+        if (code[i] === '*' && code[i + 1] === '/') {
+          i += 2;
+          break;
+        }
+        i += 1;
+      }
+      continue;
+    }
+
+    // Überflüssige Whitespaces komprimieren
+    if (/\s/.test(char)) {
+      // Ein Leerzeichen pro Sequenz, aber keine um Symbole
+      if (result && !/[\s({[,;:\-+*/%=<>!&|^?]$/.test(result) && i + 1 < code.length && !/[\s);}\],.;:\-+*/%=<>!&|^?]/.test(code[i + 1])) {
+        result += ' ';
+      }
+      i += 1;
+      while (i < code.length && /\s/.test(code[i])) i += 1;
+      continue;
+    }
+
+    result += char;
+    i += 1;
+  }
+
+  return result;
+}
+
+/** Entfernt Kommentare und überflüssige Leerzeichen aus CSS. */
+function minifyCSS(code) {
+  // Entferne Kommentare
+  let result = code.replace(/\/\*[\s\S]*?\*\//g, '');
+
+  // Komprimiere Whitespace
+  result = result
+    .replace(/\s+/g, ' ') // Mehrfache Leerzeichen → eins
+    .replace(/\s*([{}:;,>+~])\s*/g, '$1') // Leerzeichen um Symbole
+    .replace(/;\s*}/g, '}') // Letzte Semikolon vor }
+    .trim();
+
+  return result;
+}
+
 /** Zieht die im Template verlinkten Stylesheets zusammen. */
 function inlineStyles(html) {
   const linkRe = /[ \t]*<link[^>]*rel=["']stylesheet["'][^>]*href=["']([^"']+)["'][^>]*>\s*\n?/g;
   const collected = [];
   const stripped = html.replace(linkRe, (_match, href) => {
-    collected.push(`/* ---- ${href} ---- */\n` + readFileSync(resolve(ROOT, href), 'utf8'));
+    collected.push(readFileSync(resolve(ROOT, href), 'utf8'));
     return '';
   });
   return { html: stripped, css: collected.join('\n') };
@@ -314,9 +411,12 @@ function main() {
     throw new Error('index.html enthält kein <script type="module"> — Template unerwartet.');
   }
 
+  const minifiedCSS = minifyCSS(css);
+  const minifiedJS = minifyJS(bundle);
+
   const output = html
-    .replace('</head>', `  <style>\n${css}\n  </style>\n</head>`)
-    .replace(scriptRe, `  <script>\n${bundle}\n  </script>\n`);
+    .replace('</head>', `  <style>\n${minifiedCSS}\n  </style>\n</head>`)
+    .replace(scriptRe, `  <script>\n${minifiedJS}\n  </script>\n`);
 
   mkdirSync(OUT_DIR, { recursive: true });
   writeFileSync(OUT_FILE, output, 'utf8');
