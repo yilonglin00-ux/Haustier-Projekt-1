@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="de" data-theme="dark">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="color-scheme" content="light dark" />
+    <meta name="description" content="Virtuelles Haustier-Spiel: sammeln, pflegen, entwickeln — komplett im Browser, ohne Installation." />
+    <title>Fabelgarten — Virtuelles Haustier-Spiel</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐾</text></svg>" />
+    <link rel="stylesheet" href="src/styles/base.css" />
+    <link rel="stylesheet" href="src/styles/layout.css" />
+    <link rel="stylesheet" href="src/styles/components.css" />
+    <link rel="stylesheet" href="src/styles/animations.css" />
+  </head>
+  <body>
+    <!-- Ladehinweis: wird durch die App ersetzt, sobald sie gestartet ist. -->
+    <div id="boot" class="boot">
+      <div class="boot__mark" aria-hidden="true">🐾</div>
+      <p class="boot__text">Fabelgarten wird geladen …</p>
+      <noscript>
+        <p class="boot__text">Dieses Spiel benötigt JavaScript. Bitte aktiviere es in deinem Browser.</p>
+      </noscript>
+    </div>
+
+    <div id="app" class="app" hidden></div>
+    <div id="modal-root" class="modal-root"></div>
+    <div id="toast-root" class="toast-root" aria-live="polite" aria-atomic="false"></div>
+    <div id="fx-root" class="fx-root" aria-hidden="true"></div>
+
+    <script type="module" src="src/main.js"></script>
+  </body>
+</html>

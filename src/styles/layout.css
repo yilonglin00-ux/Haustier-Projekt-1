@@ -1,0 +1,280 @@
+/* ==========================================================================
+   layout.css — App-Gerüst, Navigation, Bildschirmraster, Responsivität
+   ========================================================================== */
+
+.app {
+  min-height: 100dvh;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  grid-template-areas:
+    'topbar'
+    'screen'
+    'nav';
+  background:
+    radial-gradient(120% 80% at 12% -10%, var(--scene-sky-2) 0%, transparent 55%),
+    radial-gradient(100% 70% at 90% 0%, var(--scene-sky-1) 0%, transparent 50%),
+    var(--bg);
+}
+
+/* --- Kopfleiste ----------------------------------------------------------- */
+
+.topbar {
+  grid-area: topbar;
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  padding: var(--sp-3) var(--sp-4);
+  padding-top: max(var(--sp-3), env(safe-area-inset-top));
+  background: color-mix(in srgb, var(--bg) 82%, transparent);
+  backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--border-soft);
+}
+
+.topbar__brand {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  font-family: var(--font-display);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+}
+
+.topbar__brand span[aria-hidden] {
+  font-size: 1.3rem;
+}
+
+.topbar__spacer {
+  flex: 1;
+}
+
+.topbar__wallet {
+  display: flex;
+  gap: var(--sp-2);
+}
+
+/* --- Bildschirmfläche ----------------------------------------------------- */
+
+.screen {
+  grid-area: screen;
+  width: 100%;
+  max-width: 1120px;
+  margin-inline: auto;
+  padding: var(--sp-4);
+  padding-bottom: var(--sp-6);
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-4);
+  animation: screen-in var(--t-med) var(--ease-out);
+}
+
+.screen__head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--sp-3);
+  flex-wrap: wrap;
+}
+
+.screen__title {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+}
+
+/* --- Navigation ----------------------------------------------------------- */
+
+.nav {
+  grid-area: nav;
+  position: sticky;
+  bottom: 0;
+  z-index: 20;
+  display: flex;
+  gap: var(--sp-1);
+  padding: var(--sp-2);
+  padding-bottom: max(var(--sp-2), env(safe-area-inset-bottom));
+  background: color-mix(in srgb, var(--bg) 88%, transparent);
+  backdrop-filter: blur(14px);
+  border-top: 1px solid var(--border-soft);
+}
+
+.nav__item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: var(--sp-2) var(--sp-1);
+  border-radius: var(--r-md);
+  color: var(--text-faint);
+  font-size: 0.68rem;
+  font-weight: 600;
+  transition: color var(--t-fast), background var(--t-fast), transform var(--t-fast);
+  position: relative;
+}
+
+.nav__item:hover {
+  color: var(--text-dim);
+  background: var(--glass);
+}
+
+.nav__item:active {
+  transform: scale(0.94);
+}
+
+.nav__item[aria-current='page'] {
+  color: var(--brand-strong);
+  background: color-mix(in srgb, var(--brand) 16%, transparent);
+}
+
+.nav__icon {
+  font-size: 1.25rem;
+  line-height: 1;
+}
+
+.nav__badge {
+  position: absolute;
+  top: 4px;
+  right: 50%;
+  translate: 18px 0;
+  min-width: 17px;
+  height: 17px;
+  padding: 0 4px;
+  border-radius: var(--r-pill);
+  background: var(--bad);
+  color: #fff;
+  font-size: 0.62rem;
+  font-weight: 800;
+  display: grid;
+  place-items: center;
+}
+
+/* --- Desktop: Seitenleiste statt Bodenleiste ------------------------------ */
+
+@media (min-width: 900px) {
+  .app {
+    grid-template-columns: 232px 1fr;
+    grid-template-rows: auto 1fr;
+    grid-template-areas:
+      'nav topbar'
+      'nav screen';
+  }
+
+  .nav {
+    flex-direction: column;
+    gap: 2px;
+    padding: var(--sp-4) var(--sp-3);
+    border-top: none;
+    border-right: 1px solid var(--border-soft);
+    overflow-y: auto;
+    max-height: 100dvh;
+    position: sticky;
+    top: 0;
+    bottom: auto;
+  }
+
+  .nav__item {
+    flex: none;
+    flex-direction: row;
+    justify-content: flex-start;
+    gap: var(--sp-3);
+    padding: var(--sp-3);
+    font-size: 0.92rem;
+  }
+
+  .nav__icon {
+    font-size: 1.15rem;
+    width: 1.4rem;
+    text-align: center;
+  }
+
+  .nav__badge {
+    position: static;
+    translate: none;
+    margin-left: auto;
+  }
+
+  .screen {
+    padding: var(--sp-5);
+  }
+}
+
+/* --- Raster --------------------------------------------------------------- */
+
+.grid {
+  display: grid;
+  gap: var(--sp-3);
+}
+
+.grid--auto {
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+}
+
+.grid--wide {
+  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+}
+
+.grid--tiles {
+  grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  flex-wrap: wrap;
+}
+
+.row--tight {
+  gap: var(--sp-1);
+}
+
+.col {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+}
+
+.spread {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-2);
+}
+
+/* --- Haupt-Bühne (Zuhause-Bildschirm) ------------------------------------- */
+
+.stage {
+  position: relative;
+  border-radius: var(--r-xl);
+  overflow: hidden;
+  border: 1px solid var(--glass-line);
+  background: linear-gradient(180deg, var(--scene-sky-1), var(--scene-sky-2) 62%, var(--scene-ground));
+  min-height: clamp(260px, 42dvh, 380px);
+  display: grid;
+  place-items: center;
+  box-shadow: var(--shadow-lg);
+}
+
+@media (min-width: 900px) {
+  .home-layout {
+    display: grid;
+    grid-template-columns: 1.35fr 1fr;
+    gap: var(--sp-4);
+    align-items: start;
+  }
+}
+
+@keyframes screen-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}

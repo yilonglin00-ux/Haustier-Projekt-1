@@ -1,0 +1,3449 @@
+<!DOCTYPE html>
+<html lang="de" data-theme="dark">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="color-scheme" content="light dark" />
+    <meta name="description" content="Virtuelles Haustier-Spiel: sammeln, pflegen, entwickeln — komplett im Browser, ohne Installation." />
+    <title>Fabelgarten — Virtuelles Haustier-Spiel</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐾</text></svg>" />
+  <style>
+/* ---- src/styles/base.css ---- */
+/* ==========================================================================
+   base.css — Reset, Design-Tokens, Themes, Grundtypografie
+   ========================================================================== */
+
+/* --- Reset ---------------------------------------------------------------- */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+* {
+  margin: 0;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  color: var(--text);
+  background: var(--bg);
+  overscroll-behavior: none;
+}
+
+img,
+svg,
+canvas {
+  display: block;
+  max-width: 100%;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+  color: inherit;
+}
+
+button {
+  cursor: pointer;
+  border: none;
+  background: none;
+}
+
+:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+/* --- Design-Tokens -------------------------------------------------------- */
+
+:root {
+  --font-body: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+  --font-display: 'Trebuchet MS', 'Segoe UI', system-ui, sans-serif;
+  --font-mono: ui-monospace, 'SF Mono', 'Cascadia Mono', Menlo, monospace;
+
+  /* Abstände (4-px-Raster) */
+  --sp-1: 0.25rem;
+  --sp-2: 0.5rem;
+  --sp-3: 0.75rem;
+  --sp-4: 1rem;
+  --sp-5: 1.5rem;
+  --sp-6: 2rem;
+  --sp-7: 3rem;
+
+  /* Radien */
+  --r-sm: 8px;
+  --r-md: 14px;
+  --r-lg: 20px;
+  --r-xl: 28px;
+  --r-pill: 999px;
+
+  /* Bewegung */
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --t-fast: 140ms;
+  --t-med: 260ms;
+  --t-slow: 460ms;
+
+  /* Element-Farben (themeunabhängig, sie sind Teil der Spielidentität) */
+  --el-feuer: #ff7a45;
+  --el-wasser: #38b6ff;
+  --el-natur: #4cc38a;
+  --el-blitz: #ffc93c;
+  --el-eis: #7fd8e8;
+  --el-schatten: #8b6bd9;
+  --el-licht: #ffd98e;
+  --el-gestein: #b08968;
+  --el-wind: #9ad9c8;
+  --el-metall: #a9b4c2;
+  --el-geist: #d67ab1;
+  --el-kristall: #7ae5d0;
+
+  /* Seltenheits-Farben */
+  --ra-gewoehnlich: #b6bfcc;
+  --ra-ungewoehnlich: #55c57a;
+  --ra-selten: #4aa8ff;
+  --ra-episch: #b072f5;
+  --ra-legendaer: #ffc03a;
+  --ra-mystisch: #ff5a7a;
+
+  /* Bedürfnis-Farben */
+  --stat-gesundheit: #ff6b7d;
+  --stat-energie: #ffc93c;
+  --stat-hunger: #ffa552;
+  --stat-durst: #4aa8ff;
+  --stat-sauberkeit: #7ae5d0;
+  --stat-stimmung: #ff8fc7;
+
+  --shadow-sm: 0 1px 2px rgb(0 0 0 / 0.14);
+  --shadow-md: 0 6px 18px -6px rgb(0 0 0 / 0.28);
+  --shadow-lg: 0 20px 48px -20px rgb(0 0 0 / 0.45);
+}
+
+/* --- Dunkles Theme (Standard) --------------------------------------------- */
+
+:root,
+:root[data-theme='dark'] {
+  --bg: #0e1220;
+  --bg-deep: #070a14;
+  --surface: #171d31;
+  --surface-2: #1f2740;
+  --surface-3: #2a3350;
+  --border: #2e3859;
+  --border-soft: #232c47;
+
+  --text: #eaeefb;
+  --text-dim: #a7b1cd;
+  --text-faint: #6f7a99;
+
+  --brand: #7c8cff;
+  --brand-strong: #9aa6ff;
+  --brand-ink: #0e1220;
+  --accent: #ffc93c;
+
+  --good: #4cc38a;
+  --warn: #ffb020;
+  --bad: #ff6b7d;
+
+  --focus: #9aa6ff;
+
+  --scene-sky-1: #1b2144;
+  --scene-sky-2: #2a2d5c;
+  --scene-ground: #1d2a3f;
+  --glass: rgb(255 255 255 / 0.06);
+  --glass-line: rgb(255 255 255 / 0.09);
+}
+
+/* --- Helles Theme --------------------------------------------------------- */
+
+:root[data-theme='light'] {
+  --bg: #f3f5fb;
+  --bg-deep: #e7ebf6;
+  --surface: #ffffff;
+  --surface-2: #f5f7fd;
+  --surface-3: #e9eefa;
+  --border: #d7deee;
+  --border-soft: #e6ebf7;
+
+  --text: #182034;
+  --text-dim: #55617e;
+  --text-faint: #8b95af;
+
+  --brand: #5566f0;
+  --brand-strong: #4353e0;
+  --brand-ink: #ffffff;
+  --accent: #f0a416;
+
+  --good: #22a06b;
+  --warn: #d98200;
+  --bad: #e0455c;
+
+  --focus: #4353e0;
+
+  --scene-sky-1: #cfe3ff;
+  --scene-sky-2: #eadcff;
+  --scene-ground: #d5ecd8;
+  --glass: rgb(18 24 40 / 0.04);
+  --glass-line: rgb(18 24 40 / 0.08);
+
+  --shadow-md: 0 6px 18px -8px rgb(30 45 90 / 0.22);
+  --shadow-lg: 0 20px 48px -22px rgb(30 45 90 / 0.32);
+}
+
+/* --- Typografie ----------------------------------------------------------- */
+
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--font-display);
+  line-height: 1.2;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+h1 {
+  font-size: clamp(1.5rem, 1.1rem + 1.6vw, 2.1rem);
+}
+h2 {
+  font-size: clamp(1.2rem, 1rem + 0.9vw, 1.55rem);
+}
+h3 {
+  font-size: 1.05rem;
+}
+
+p {
+  text-wrap: pretty;
+}
+
+.muted {
+  color: var(--text-dim);
+}
+.faint {
+  color: var(--text-faint);
+}
+.tiny {
+  font-size: 0.78rem;
+}
+.small {
+  font-size: 0.86rem;
+}
+.center {
+  text-align: center;
+}
+.mono {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* --- Ladebildschirm ------------------------------------------------------- */
+
+.boot {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: var(--sp-4);
+  background: var(--bg);
+  z-index: 100;
+}
+
+.boot__mark {
+  font-size: 3.5rem;
+  animation: boot-pulse 1.4s var(--ease-out) infinite;
+}
+
+.boot__text {
+  color: var(--text-dim);
+}
+
+@keyframes boot-pulse {
+  0%,
+  100% {
+    transform: scale(1) rotate(-4deg);
+    opacity: 0.7;
+  }
+  50% {
+    transform: scale(1.14) rotate(4deg);
+    opacity: 1;
+  }
+}
+
+/* --- Scrollbars ----------------------------------------------------------- */
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
+}
+
+*::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+*::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: var(--r-pill);
+  border: 3px solid transparent;
+  background-clip: content-box;
+}
+
+/* ---- src/styles/layout.css ---- */
+/* ==========================================================================
+   layout.css — App-Gerüst, Navigation, Bildschirmraster, Responsivität
+   ========================================================================== */
+
+.app {
+  min-height: 100dvh;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  grid-template-areas:
+    'topbar'
+    'screen'
+    'nav';
+  background:
+    radial-gradient(120% 80% at 12% -10%, var(--scene-sky-2) 0%, transparent 55%),
+    radial-gradient(100% 70% at 90% 0%, var(--scene-sky-1) 0%, transparent 50%),
+    var(--bg);
+}
+
+/* --- Kopfleiste ----------------------------------------------------------- */
+
+.topbar {
+  grid-area: topbar;
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  padding: var(--sp-3) var(--sp-4);
+  padding-top: max(var(--sp-3), env(safe-area-inset-top));
+  background: color-mix(in srgb, var(--bg) 82%, transparent);
+  backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--border-soft);
+}
+
+.topbar__brand {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  font-family: var(--font-display);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+}
+
+.topbar__brand span[aria-hidden] {
+  font-size: 1.3rem;
+}
+
+.topbar__spacer {
+  flex: 1;
+}
+
+.topbar__wallet {
+  display: flex;
+  gap: var(--sp-2);
+}
+
+/* --- Bildschirmfläche ----------------------------------------------------- */
+
+.screen {
+  grid-area: screen;
+  width: 100%;
+  max-width: 1120px;
+  margin-inline: auto;
+  padding: var(--sp-4);
+  padding-bottom: var(--sp-6);
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-4);
+  animation: screen-in var(--t-med) var(--ease-out);
+}
+
+.screen__head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--sp-3);
+  flex-wrap: wrap;
+}
+
+.screen__title {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+}
+
+/* --- Navigation ----------------------------------------------------------- */
+
+.nav {
+  grid-area: nav;
+  position: sticky;
+  bottom: 0;
+  z-index: 20;
+  display: flex;
+  gap: var(--sp-1);
+  padding: var(--sp-2);
+  padding-bottom: max(var(--sp-2), env(safe-area-inset-bottom));
+  background: color-mix(in srgb, var(--bg) 88%, transparent);
+  backdrop-filter: blur(14px);
+  border-top: 1px solid var(--border-soft);
+}
+
+.nav__item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: var(--sp-2) var(--sp-1);
+  border-radius: var(--r-md);
+  color: var(--text-faint);
+  font-size: 0.68rem;
+  font-weight: 600;
+  transition: color var(--t-fast), background var(--t-fast), transform var(--t-fast);
+  position: relative;
+}
+
+.nav__item:hover {
+  color: var(--text-dim);
+  background: var(--glass);
+}
+
+.nav__item:active {
+  transform: scale(0.94);
+}
+
+.nav__item[aria-current='page'] {
+  color: var(--brand-strong);
+  background: color-mix(in srgb, var(--brand) 16%, transparent);
+}
+
+.nav__icon {
+  font-size: 1.25rem;
+  line-height: 1;
+}
+
+.nav__badge {
+  position: absolute;
+  top: 4px;
+  right: 50%;
+  translate: 18px 0;
+  min-width: 17px;
+  height: 17px;
+  padding: 0 4px;
+  border-radius: var(--r-pill);
+  background: var(--bad);
+  color: #fff;
+  font-size: 0.62rem;
+  font-weight: 800;
+  display: grid;
+  place-items: center;
+}
+
+/* --- Desktop: Seitenleiste statt Bodenleiste ------------------------------ */
+
+@media (min-width: 900px) {
+  .app {
+    grid-template-columns: 232px 1fr;
+    grid-template-rows: auto 1fr;
+    grid-template-areas:
+      'nav topbar'
+      'nav screen';
+  }
+
+  .nav {
+    flex-direction: column;
+    gap: 2px;
+    padding: var(--sp-4) var(--sp-3);
+    border-top: none;
+    border-right: 1px solid var(--border-soft);
+    overflow-y: auto;
+    max-height: 100dvh;
+    position: sticky;
+    top: 0;
+    bottom: auto;
+  }
+
+  .nav__item {
+    flex: none;
+    flex-direction: row;
+    justify-content: flex-start;
+    gap: var(--sp-3);
+    padding: var(--sp-3);
+    font-size: 0.92rem;
+  }
+
+  .nav__icon {
+    font-size: 1.15rem;
+    width: 1.4rem;
+    text-align: center;
+  }
+
+  .nav__badge {
+    position: static;
+    translate: none;
+    margin-left: auto;
+  }
+
+  .screen {
+    padding: var(--sp-5);
+  }
+}
+
+/* --- Raster --------------------------------------------------------------- */
+
+.grid {
+  display: grid;
+  gap: var(--sp-3);
+}
+
+.grid--auto {
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+}
+
+.grid--wide {
+  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+}
+
+.grid--tiles {
+  grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  flex-wrap: wrap;
+}
+
+.row--tight {
+  gap: var(--sp-1);
+}
+
+.col {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+}
+
+.spread {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-2);
+}
+
+/* --- Haupt-Bühne (Zuhause-Bildschirm) ------------------------------------- */
+
+.stage {
+  position: relative;
+  border-radius: var(--r-xl);
+  overflow: hidden;
+  border: 1px solid var(--glass-line);
+  background: linear-gradient(180deg, var(--scene-sky-1), var(--scene-sky-2) 62%, var(--scene-ground));
+  min-height: clamp(260px, 42dvh, 380px);
+  display: grid;
+  place-items: center;
+  box-shadow: var(--shadow-lg);
+}
+
+@media (min-width: 900px) {
+  .home-layout {
+    display: grid;
+    grid-template-columns: 1.35fr 1fr;
+    gap: var(--sp-4);
+    align-items: start;
+  }
+}
+
+@keyframes screen-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* ---- src/styles/components.css ---- */
+/* ==========================================================================
+   components.css — Karten, Knöpfe, Leisten, Dialoge, Chips, Kacheln
+   ========================================================================== */
+
+/* --- Karten --------------------------------------------------------------- */
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--r-lg);
+  padding: var(--sp-4);
+  box-shadow: var(--shadow-sm);
+}
+
+.card--flush {
+  padding: 0;
+  overflow: hidden;
+}
+
+.card--glass {
+  background: var(--glass);
+  border-color: var(--glass-line);
+  backdrop-filter: blur(10px);
+}
+
+.card__title {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  margin-bottom: var(--sp-3);
+}
+
+.section-label {
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
+
+/* --- Knöpfe --------------------------------------------------------------- */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-2);
+  padding: 0.62rem 1.05rem;
+  border-radius: var(--r-pill);
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-weight: 650;
+  font-size: 0.92rem;
+  white-space: nowrap;
+  transition: transform var(--t-fast) var(--ease-spring), background var(--t-fast),
+    border-color var(--t-fast), opacity var(--t-fast);
+}
+
+.btn:hover:not(:disabled) {
+  background: var(--surface-3);
+  border-color: var(--brand);
+}
+
+.btn:active:not(:disabled) {
+  transform: scale(0.95);
+}
+
+.btn:disabled {
+  opacity: 0.42;
+  cursor: not-allowed;
+}
+
+.btn--primary {
+  background: linear-gradient(135deg, var(--brand), var(--brand-strong));
+  border-color: transparent;
+  color: var(--brand-ink);
+  box-shadow: 0 6px 18px -8px color-mix(in srgb, var(--brand) 80%, transparent);
+}
+
+.btn--primary:hover:not(:disabled) {
+  filter: brightness(1.08);
+  background: linear-gradient(135deg, var(--brand), var(--brand-strong));
+}
+
+.btn--ghost {
+  background: transparent;
+  border-color: transparent;
+}
+
+.btn--ghost:hover:not(:disabled) {
+  background: var(--glass);
+  border-color: var(--glass-line);
+}
+
+.btn--danger {
+  border-color: color-mix(in srgb, var(--bad) 55%, transparent);
+  color: var(--bad);
+}
+
+.btn--danger:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--bad) 14%, transparent);
+  border-color: var(--bad);
+}
+
+.btn--block {
+  width: 100%;
+}
+
+.btn--sm {
+  padding: 0.4rem 0.75rem;
+  font-size: 0.82rem;
+}
+
+.btn--icon {
+  padding: 0.5rem;
+  aspect-ratio: 1;
+  border-radius: var(--r-pill);
+}
+
+/* --- Aktionsknöpfe (Zuhause) ---------------------------------------------- */
+
+.action-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(78px, 1fr));
+  gap: var(--sp-2);
+}
+
+.action {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: var(--sp-3) var(--sp-1);
+  border-radius: var(--r-md);
+  background: var(--surface-2);
+  border: 1px solid var(--border-soft);
+  font-size: 0.72rem;
+  font-weight: 650;
+  color: var(--text-dim);
+  transition: transform var(--t-fast) var(--ease-spring), background var(--t-fast),
+    color var(--t-fast), border-color var(--t-fast);
+}
+
+.action:hover:not(:disabled) {
+  background: var(--surface-3);
+  color: var(--text);
+  border-color: var(--brand);
+  transform: translateY(-2px);
+}
+
+.action:active:not(:disabled) {
+  transform: scale(0.93);
+}
+
+.action:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.action__icon {
+  font-size: 1.5rem;
+  line-height: 1;
+}
+
+/* --- Chips & Abzeichen ---------------------------------------------------- */
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 0.22rem 0.62rem;
+  border-radius: var(--r-pill);
+  background: var(--glass);
+  border: 1px solid var(--glass-line);
+  font-size: 0.76rem;
+  font-weight: 650;
+  white-space: nowrap;
+}
+
+.chip--wallet {
+  background: var(--surface-2);
+  border-color: var(--border-soft);
+  font-variant-numeric: tabular-nums;
+}
+
+.chip--el {
+  color: var(--el-color, var(--text));
+  border-color: color-mix(in srgb, var(--el-color, var(--brand)) 40%, transparent);
+  background: color-mix(in srgb, var(--el-color, var(--brand)) 14%, transparent);
+}
+
+.chip--rarity {
+  color: var(--ra-color, var(--text));
+  border-color: color-mix(in srgb, var(--ra-color, var(--brand)) 45%, transparent);
+  background: color-mix(in srgb, var(--ra-color, var(--brand)) 15%, transparent);
+}
+
+/* Seltenheits-Farbe als Variable setzen (von JS über data-rarity gesetzt) */
+[data-rarity='gewoehnlich'] { --ra-color: var(--ra-gewoehnlich); }
+[data-rarity='ungewoehnlich'] { --ra-color: var(--ra-ungewoehnlich); }
+[data-rarity='selten'] { --ra-color: var(--ra-selten); }
+[data-rarity='episch'] { --ra-color: var(--ra-episch); }
+[data-rarity='legendaer'] { --ra-color: var(--ra-legendaer); }
+[data-rarity='mystisch'] { --ra-color: var(--ra-mystisch); }
+
+[data-element='feuer'] { --el-color: var(--el-feuer); }
+[data-element='wasser'] { --el-color: var(--el-wasser); }
+[data-element='natur'] { --el-color: var(--el-natur); }
+[data-element='blitz'] { --el-color: var(--el-blitz); }
+[data-element='eis'] { --el-color: var(--el-eis); }
+[data-element='schatten'] { --el-color: var(--el-schatten); }
+[data-element='licht'] { --el-color: var(--el-licht); }
+[data-element='gestein'] { --el-color: var(--el-gestein); }
+[data-element='wind'] { --el-color: var(--el-wind); }
+[data-element='metall'] { --el-color: var(--el-metall); }
+[data-element='geist'] { --el-color: var(--el-geist); }
+[data-element='kristall'] { --el-color: var(--el-kristall); }
+
+/* --- Werteleisten --------------------------------------------------------- */
+
+.stat {
+  display: grid;
+  grid-template-columns: 1.15rem 1fr auto;
+  align-items: center;
+  gap: var(--sp-2);
+  font-size: 0.8rem;
+}
+
+.stat__icon {
+  text-align: center;
+}
+
+.stat__track {
+  height: 9px;
+  border-radius: var(--r-pill);
+  background: var(--surface-3);
+  overflow: hidden;
+  position: relative;
+}
+
+.stat__fill {
+  height: 100%;
+  border-radius: var(--r-pill);
+  background: var(--stat-color, var(--brand));
+  transition: width var(--t-slow) var(--ease-out), background var(--t-med);
+  position: relative;
+}
+
+.stat__fill::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgb(255 255 255 / 0.28), transparent 60%);
+}
+
+.stat__value {
+  font-variant-numeric: tabular-nums;
+  color: var(--text-dim);
+  min-width: 2.4rem;
+  text-align: right;
+}
+
+.stat--low .stat__fill {
+  animation: stat-warn 1.6s ease-in-out infinite;
+}
+
+/* Attributwerte (Stärke, Intelligenz …) */
+.attr-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(84px, 1fr));
+  gap: var(--sp-2);
+}
+
+.attr {
+  background: var(--surface-2);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--r-md);
+  padding: var(--sp-2);
+  text-align: center;
+}
+
+.attr__value {
+  font-family: var(--font-display);
+  font-size: 1.2rem;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+.attr__label {
+  font-size: 0.68rem;
+  color: var(--text-faint);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+/* --- Fortschrittsbalken (XP, Brutzeit, Expedition) ------------------------ */
+
+.progress {
+  height: 7px;
+  border-radius: var(--r-pill);
+  background: var(--surface-3);
+  overflow: hidden;
+}
+
+.progress__fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--brand), var(--accent));
+  border-radius: var(--r-pill);
+  transition: width var(--t-slow) var(--ease-out);
+}
+
+/* --- Haustier-Karten ------------------------------------------------------ */
+
+.pet-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+  padding: var(--sp-3);
+  border-radius: var(--r-lg);
+  background: var(--surface);
+  border: 1px solid var(--border-soft);
+  text-align: left;
+  transition: transform var(--t-fast) var(--ease-spring), border-color var(--t-fast),
+    box-shadow var(--t-fast);
+  overflow: hidden;
+}
+
+.pet-card::before {
+  content: '';
+  position: absolute;
+  inset: -40% 40% 60% -40%;
+  background: radial-gradient(circle, color-mix(in srgb, var(--ra-color, var(--brand)) 40%, transparent), transparent 70%);
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.pet-card:hover {
+  transform: translateY(-3px);
+  border-color: var(--ra-color, var(--brand));
+  box-shadow: var(--shadow-md);
+}
+
+.pet-card--active {
+  border-color: var(--brand);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--brand) 45%, transparent);
+}
+
+.pet-card__art {
+  height: 92px;
+  display: grid;
+  place-items: center;
+  position: relative;
+}
+
+.pet-card__name {
+  font-weight: 700;
+  font-size: 0.95rem;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.pet-card__meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-1);
+  font-size: 0.74rem;
+  color: var(--text-faint);
+}
+
+.pet-card__fav {
+  position: absolute;
+  top: var(--sp-2);
+  right: var(--sp-2);
+  font-size: 0.9rem;
+}
+
+/* --- Sprite-Hülle --------------------------------------------------------- */
+
+.sprite {
+  width: 100%;
+  height: 100%;
+  display: grid;
+  place-items: center;
+  position: relative;
+}
+
+.sprite svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.sprite--stage {
+  width: min(62%, 260px);
+  aspect-ratio: 1;
+}
+
+/* --- Item-Kacheln --------------------------------------------------------- */
+
+.tile {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  padding: var(--sp-3) var(--sp-2);
+  border-radius: var(--r-md);
+  background: var(--surface-2);
+  border: 1px solid var(--border-soft);
+  transition: transform var(--t-fast) var(--ease-spring), border-color var(--t-fast);
+  text-align: center;
+}
+
+.tile:hover:not(:disabled) {
+  transform: translateY(-2px);
+  border-color: var(--ra-color, var(--brand));
+}
+
+.tile:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.tile__icon {
+  font-size: 1.7rem;
+  line-height: 1;
+}
+
+.tile__label {
+  font-size: 0.72rem;
+  font-weight: 650;
+  line-height: 1.25;
+}
+
+.tile__count {
+  position: absolute;
+  top: 4px;
+  right: 6px;
+  font-size: 0.68rem;
+  font-weight: 800;
+  color: var(--text-faint);
+  font-variant-numeric: tabular-nums;
+}
+
+.tile--locked {
+  filter: grayscale(1);
+  opacity: 0.5;
+}
+
+/* --- Dialoge -------------------------------------------------------------- */
+
+.modal-root:empty {
+  display: none;
+}
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: grid;
+  place-items: center;
+  padding: var(--sp-4);
+  background: rgb(4 6 14 / 0.62);
+  backdrop-filter: blur(6px);
+  animation: fade-in var(--t-fast) ease-out;
+}
+
+.modal {
+  width: min(560px, 100%);
+  max-height: min(84dvh, 720px);
+  overflow-y: auto;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-xl);
+  padding: var(--sp-5);
+  box-shadow: var(--shadow-lg);
+  animation: modal-in var(--t-med) var(--ease-spring);
+}
+
+.modal__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--sp-3);
+  margin-bottom: var(--sp-3);
+}
+
+.modal__body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+}
+
+.modal__foot {
+  display: flex;
+  gap: var(--sp-2);
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  margin-top: var(--sp-4);
+}
+
+/* --- Hinweise (Toasts) ---------------------------------------------------- */
+
+.toast-root {
+  position: fixed;
+  left: 50%;
+  translate: -50% 0;
+  bottom: calc(84px + env(safe-area-inset-bottom));
+  z-index: 70;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--sp-2);
+  pointer-events: none;
+  width: min(440px, calc(100% - 2rem));
+}
+
+@media (min-width: 900px) {
+  .toast-root {
+    bottom: var(--sp-5);
+  }
+}
+
+.toast {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  padding: 0.6rem 1rem;
+  border-radius: var(--r-pill);
+  background: var(--surface-3);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-md);
+  font-size: 0.88rem;
+  font-weight: 600;
+  animation: toast-in var(--t-med) var(--ease-spring);
+  max-width: 100%;
+}
+
+.toast--good {
+  border-color: color-mix(in srgb, var(--good) 55%, transparent);
+}
+.toast--bad {
+  border-color: color-mix(in srgb, var(--bad) 55%, transparent);
+}
+.toast--rare {
+  border-color: var(--ra-legendaer);
+  box-shadow: 0 0 24px -6px var(--ra-legendaer);
+}
+
+.toast--leaving {
+  animation: toast-out var(--t-med) var(--ease-out) forwards;
+}
+
+/* --- Effekt-Ebene --------------------------------------------------------- */
+
+.fx-root {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 80;
+  overflow: hidden;
+}
+
+.fx-float {
+  position: absolute;
+  font-weight: 800;
+  font-size: 1rem;
+  text-shadow: 0 2px 6px rgb(0 0 0 / 0.45);
+  animation: float-up 1.1s var(--ease-out) forwards;
+  white-space: nowrap;
+}
+
+.fx-particle {
+  position: absolute;
+  font-size: 1.1rem;
+  animation: particle-burst 0.9s var(--ease-out) forwards;
+}
+
+/* --- Reiter --------------------------------------------------------------- */
+
+.tabs {
+  display: flex;
+  gap: var(--sp-1);
+  padding: 4px;
+  background: var(--surface-2);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--r-pill);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.tabs::-webkit-scrollbar {
+  display: none;
+}
+
+.tab {
+  flex: 1 0 auto;
+  padding: 0.42rem 0.9rem;
+  border-radius: var(--r-pill);
+  font-size: 0.84rem;
+  font-weight: 650;
+  color: var(--text-dim);
+  white-space: nowrap;
+  transition: background var(--t-fast), color var(--t-fast);
+}
+
+.tab[aria-selected='true'] {
+  background: var(--surface);
+  color: var(--text);
+  box-shadow: var(--shadow-sm);
+}
+
+/* --- Formularelemente ----------------------------------------------------- */
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-1);
+}
+
+.field__label {
+  font-size: 0.8rem;
+  font-weight: 650;
+  color: var(--text-dim);
+}
+
+.input,
+.select {
+  padding: 0.55rem 0.8rem;
+  border-radius: var(--r-md);
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  transition: border-color var(--t-fast);
+  width: 100%;
+}
+
+.input:focus,
+.select:focus {
+  border-color: var(--brand);
+  outline: none;
+}
+
+.switch {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-3);
+  padding: var(--sp-3) 0;
+  border-bottom: 1px solid var(--border-soft);
+  width: 100%;
+  text-align: left;
+}
+
+.switch:last-child {
+  border-bottom: none;
+}
+
+.switch__track {
+  flex: none;
+  width: 46px;
+  height: 26px;
+  border-radius: var(--r-pill);
+  background: var(--surface-3);
+  border: 1px solid var(--border);
+  position: relative;
+  transition: background var(--t-fast);
+}
+
+.switch__track::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--text-faint);
+  transition: transform var(--t-med) var(--ease-spring), background var(--t-fast);
+}
+
+.switch[aria-checked='true'] .switch__track {
+  background: color-mix(in srgb, var(--brand) 45%, transparent);
+  border-color: var(--brand);
+}
+
+.switch[aria-checked='true'] .switch__track::after {
+  transform: translateX(20px);
+  background: var(--brand-strong);
+}
+
+/* --- Leerzustände --------------------------------------------------------- */
+
+.empty {
+  display: grid;
+  place-items: center;
+  gap: var(--sp-2);
+  padding: var(--sp-6) var(--sp-4);
+  text-align: center;
+  color: var(--text-faint);
+}
+
+.empty__icon {
+  font-size: 2.5rem;
+  opacity: 0.6;
+}
+
+/* --- Listeneinträge ------------------------------------------------------- */
+
+.list-item {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  padding: var(--sp-3);
+  border-radius: var(--r-md);
+  background: var(--surface-2);
+  border: 1px solid var(--border-soft);
+  width: 100%;
+  text-align: left;
+}
+
+.list-item__icon {
+  font-size: 1.5rem;
+  flex: none;
+  width: 2rem;
+  text-align: center;
+}
+
+.list-item__body {
+  flex: 1;
+  min-width: 0;
+}
+
+.list-item__title {
+  font-weight: 650;
+  font-size: 0.92rem;
+}
+
+.list-item--done {
+  border-color: color-mix(in srgb, var(--good) 50%, transparent);
+  background: color-mix(in srgb, var(--good) 10%, var(--surface-2));
+}
+
+.list-item--locked {
+  opacity: 0.55;
+}
+
+/* ---- src/styles/animations.css ---- */
+/* ==========================================================================
+   animations.css — Keyframes und Haustier-Animationszustände
+   ==========================================================================
+   Die Sprites (prozedural wie handgezeichnet) liefern immer dieselben
+   Gruppen-Klassen: .pet-root, .pet-body, .pet-head, .pet-eye, .pet-tail,
+   .pet-ear, .pet-wing, .pet-aura. Dadurch gelten diese Animationen für
+   jede Kreatur, unabhängig von ihrer Herkunft.
+   ========================================================================== */
+
+/* --- Allgemeine Keyframes ------------------------------------------------- */
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes modal-in {
+  from {
+    opacity: 0;
+    transform: translateY(18px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(14px) scale(0.94);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes toast-out {
+  to {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.96);
+  }
+}
+
+@keyframes float-up {
+  0% {
+    opacity: 0;
+    transform: translateY(0) scale(0.7);
+  }
+  18% {
+    opacity: 1;
+    transform: translateY(-10px) scale(1.12);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-72px) scale(1);
+  }
+}
+
+@keyframes particle-burst {
+  0% {
+    opacity: 1;
+    transform: translate(0, 0) scale(0.5) rotate(0deg);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(var(--dx, 0), var(--dy, -60px)) scale(1.15) rotate(var(--dr, 180deg));
+  }
+}
+
+@keyframes stat-warn {
+  0%,
+  100% {
+    filter: brightness(1);
+  }
+  50% {
+    filter: brightness(1.55);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -180% 0;
+  }
+  100% {
+    background-position: 180% 0;
+  }
+}
+
+@keyframes pop-in {
+  from {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes spin-slow {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* --- Grundbewegung des Sprites -------------------------------------------- */
+
+.pet-root {
+  transform-box: fill-box;
+  transform-origin: center bottom;
+}
+
+.sprite--animated .pet-root {
+  animation: pet-breathe 3.4s ease-in-out infinite;
+}
+
+@keyframes pet-breathe {
+  0%,
+  100% {
+    transform: scaleY(1) translateY(0);
+  }
+  50% {
+    transform: scaleY(1.035) translateY(-1.5%);
+  }
+}
+
+.sprite--animated .pet-tail {
+  transform-box: fill-box;
+  transform-origin: left center;
+  animation: pet-tail 2.1s ease-in-out infinite;
+}
+
+@keyframes pet-tail {
+  0%,
+  100% {
+    transform: rotate(-7deg);
+  }
+  50% {
+    transform: rotate(9deg);
+  }
+}
+
+.sprite--animated .pet-ear {
+  transform-box: fill-box;
+  transform-origin: center bottom;
+  animation: pet-ear 4.2s ease-in-out infinite;
+}
+
+@keyframes pet-ear {
+  0%,
+  92%,
+  100% {
+    transform: rotate(0deg);
+  }
+  95% {
+    transform: rotate(-8deg);
+  }
+}
+
+.sprite--animated .pet-eye {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: pet-blink 5.2s ease-in-out infinite;
+}
+
+@keyframes pet-blink {
+  0%,
+  94%,
+  100% {
+    transform: scaleY(1);
+  }
+  96% {
+    transform: scaleY(0.08);
+  }
+}
+
+.sprite--animated .pet-wing {
+  transform-box: fill-box;
+  transform-origin: right center;
+  animation: pet-wing 1.5s ease-in-out infinite;
+}
+
+@keyframes pet-wing {
+  0%,
+  100% {
+    transform: rotate(0deg) scaleX(1);
+  }
+  50% {
+    transform: rotate(-16deg) scaleX(0.88);
+  }
+}
+
+.pet-aura {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: pet-aura 4s ease-in-out infinite;
+}
+
+@keyframes pet-aura {
+  0%,
+  100% {
+    opacity: 0.35;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.7;
+    transform: scale(1.07);
+  }
+}
+
+.pet-orbit {
+  transform-box: view-box;
+  transform-origin: 50% 50%;
+  animation: spin-slow 9s linear infinite;
+}
+
+.pet-float {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: pet-float 3s ease-in-out infinite;
+}
+
+@keyframes pet-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-4%);
+  }
+}
+
+/* --- Zustände ------------------------------------------------------------- */
+
+.sprite[data-mood='schlafend'] .pet-root {
+  animation: pet-sleep 4.2s ease-in-out infinite;
+}
+
+.sprite[data-mood='schlafend'] .pet-eye {
+  animation: none;
+  transform: scaleY(0.1);
+}
+
+@keyframes pet-sleep {
+  0%,
+  100% {
+    transform: scale(1, 0.98) translateY(1%) rotate(-1deg);
+  }
+  50% {
+    transform: scale(1.02, 1.01) translateY(-0.5%) rotate(1deg);
+  }
+}
+
+.sprite[data-mood='krank'] .pet-root {
+  filter: saturate(0.5) brightness(0.88);
+  animation: pet-sick 2.4s ease-in-out infinite;
+}
+
+@keyframes pet-sick {
+  0%,
+  100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  25% {
+    transform: translateY(1.5%) rotate(-1.5deg);
+  }
+  75% {
+    transform: translateY(1.5%) rotate(1.5deg);
+  }
+}
+
+.sprite[data-mood='traurig'] .pet-root {
+  animation: pet-sad 3.6s ease-in-out infinite;
+}
+
+@keyframes pet-sad {
+  0%,
+  100% {
+    transform: translateY(2%) scaleY(0.97);
+  }
+  50% {
+    transform: translateY(3%) scaleY(0.95);
+  }
+}
+
+.sprite[data-mood='begeistert'] .pet-root {
+  animation: pet-hop 0.85s var(--ease-spring) infinite;
+}
+
+@keyframes pet-hop {
+  0%,
+  100% {
+    transform: translateY(0) scaleY(1);
+  }
+  30% {
+    transform: translateY(-9%) scaleY(1.05);
+  }
+  55% {
+    transform: translateY(0) scaleY(0.94);
+  }
+}
+
+/* --- Einmalige Aktions-Animationen ---------------------------------------- */
+
+.sprite--act-essen .pet-root {
+  animation: act-eat 0.75s ease-in-out 2;
+}
+
+@keyframes act-eat {
+  0%,
+  100% {
+    transform: translateY(0) rotate(0);
+  }
+  40% {
+    transform: translateY(3%) rotate(-4deg) scaleY(0.94);
+  }
+  70% {
+    transform: translateY(0) rotate(3deg);
+  }
+}
+
+.sprite--act-spielen .pet-root {
+  animation: act-play 0.6s var(--ease-spring) 3;
+}
+
+@keyframes act-play {
+  0%,
+  100% {
+    transform: translateY(0) rotate(0);
+  }
+  25% {
+    transform: translateY(-14%) rotate(-9deg);
+  }
+  60% {
+    transform: translateY(-4%) rotate(8deg);
+  }
+}
+
+.sprite--act-streicheln .pet-root {
+  animation: act-pet 0.9s ease-in-out 2;
+}
+
+@keyframes act-pet {
+  0%,
+  100% {
+    transform: rotate(0) scale(1);
+  }
+  30% {
+    transform: rotate(-5deg) scale(1.04);
+  }
+  65% {
+    transform: rotate(5deg) scale(1.04);
+  }
+}
+
+.sprite--act-training .pet-root {
+  animation: act-train 0.45s ease-in-out 4;
+}
+
+@keyframes act-train {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  30% {
+    transform: translateX(-5%) scaleX(1.03);
+  }
+  70% {
+    transform: translateX(5%) scaleX(0.97);
+  }
+}
+
+.sprite--act-baden .pet-root {
+  animation: act-bath 0.7s ease-in-out 3;
+}
+
+@keyframes act-bath {
+  0%,
+  100% {
+    transform: rotate(0);
+  }
+  25% {
+    transform: rotate(-12deg);
+  }
+  75% {
+    transform: rotate(12deg);
+  }
+}
+
+/* --- Entwicklung ---------------------------------------------------------- */
+
+.evolve-stage {
+  position: relative;
+  display: grid;
+  place-items: center;
+  min-height: 240px;
+}
+
+.evolve-stage .sprite {
+  width: 200px;
+  height: 200px;
+}
+
+.evolve-stage--flash .sprite {
+  animation: evolve-flash 2.6s ease-in-out forwards;
+}
+
+@keyframes evolve-flash {
+  0% {
+    filter: brightness(1);
+    transform: scale(1);
+  }
+  20% {
+    filter: brightness(2.5) saturate(0);
+    transform: scale(1.06);
+  }
+  40% {
+    filter: brightness(1.2) saturate(0.4);
+    transform: scale(0.96);
+  }
+  60% {
+    filter: brightness(3) saturate(0);
+    transform: scale(1.1);
+  }
+  100% {
+    filter: brightness(1);
+    transform: scale(1);
+  }
+}
+
+.evolve-rays {
+  position: absolute;
+  inset: 0;
+  background: conic-gradient(
+    from 0deg,
+    transparent 0deg 12deg,
+    color-mix(in srgb, var(--accent) 55%, transparent) 14deg 18deg,
+    transparent 20deg 32deg
+  );
+  border-radius: 50%;
+  animation: spin-slow 6s linear infinite;
+  opacity: 0.6;
+  mask-image: radial-gradient(circle, transparent 28%, #000 70%);
+}
+
+/* --- Ei-Animationen ------------------------------------------------------- */
+
+.egg-shake {
+  animation: egg-shake 2.6s ease-in-out infinite;
+  transform-origin: center bottom;
+}
+
+@keyframes egg-shake {
+  0%,
+  70%,
+  100% {
+    transform: rotate(0);
+  }
+  75% {
+    transform: rotate(-9deg);
+  }
+  80% {
+    transform: rotate(8deg);
+  }
+  85% {
+    transform: rotate(-6deg);
+  }
+  90% {
+    transform: rotate(4deg);
+  }
+}
+
+/* --- Glanz-Effekt für seltene Karten -------------------------------------- */
+
+.shine {
+  position: relative;
+  overflow: hidden;
+}
+
+.shine::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    110deg,
+    transparent 35%,
+    rgb(255 255 255 / 0.35) 48%,
+    transparent 62%
+  );
+  background-size: 220% 100%;
+  animation: shimmer 3.4s ease-in-out infinite;
+  pointer-events: none;
+}
+
+/* --- Reduzierte Bewegung -------------------------------------------------- */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
+
+/* Manuell in den Einstellungen abschaltbar */
+html[data-motion='reduced'] *,
+html[data-motion='reduced'] *::before,
+html[data-motion='reduced'] *::after {
+  animation-duration: 0.001ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.001ms !important;
+}
+
+  </style>
+</head>
+  <body>
+    <!-- Ladehinweis: wird durch die App ersetzt, sobald sie gestartet ist. -->
+    <div id="boot" class="boot">
+      <div class="boot__mark" aria-hidden="true">🐾</div>
+      <p class="boot__text">Fabelgarten wird geladen …</p>
+      <noscript>
+        <p class="boot__text">Dieses Spiel benötigt JavaScript. Bitte aktiviere es in deinem Browser.</p>
+      </noscript>
+    </div>
+
+    <div id="app" class="app" hidden></div>
+    <div id="modal-root" class="modal-root"></div>
+    <div id="toast-root" class="toast-root" aria-live="polite" aria-atomic="false"></div>
+    <div id="fx-root" class="fx-root" aria-hidden="true"></div>
+
+  <script>
+(function(){
+"use strict";
+var __defs = {}, __cache = {};
+function __require(id){
+  var cached = __cache[id];
+  if (cached) return cached.exports;
+  var mod = __cache[id] = { exports: {} };
+  var factory = __defs[id];
+  if (!factory) throw new Error('Modul nicht gefunden: ' + id);
+  factory(mod.exports, __require);
+  return mod.exports;
+}
+function __define(id, factory){ __defs[id] = factory; }
+
+__define("src/main.js", function(__exports, __require){
+/**
+ * main.js — Einstiegspunkt.
+ *
+ * Reihenfolge beim Start:
+ *   1. Spielstand laden (oder neu anlegen)
+ *   2. Systeme an den Spiel-Loop hängen
+ *   3. Oberfläche aufbauen und Bildschirme anmelden
+ *   4. Abwesenheit nachrechnen, dann den Loop starten
+ */
+
+const { setState, getState, subscribe, update } = __require("src/core/state.js");
+const { loadSave, installAutosave } = __require("src/core/storage.js");
+const { startLoop, catchUp, installDayWatcher, installPlaytimeTracker } = __require("src/core/loop.js");
+const { mountApp, applyTheme, applyMotion, installResponsiveNav } = __require("src/ui/app.js");
+const { navigate, registerScreen } = __require("src/ui/router.js");
+const { toast } = __require("src/ui/components/toast.js");
+const { h } = __require("src/core/util.js");
+
+function boot() {
+  // 1. Spielstand ---------------------------------------------------------
+  const { save, isNew, error } = loadSave();
+  setState(save);
+  update((s) => {
+    s.statistik.sitzungen += 1;
+  }, { silent: true });
+
+  applyTheme(save.einstellungen.theme);
+  applyMotion(save.einstellungen.bewegung);
+
+  // 2. Systeme ------------------------------------------------------------
+  installDayWatcher();
+  installPlaytimeTracker();
+  installAutosave(subscribe);
+
+  // 3. Oberfläche ---------------------------------------------------------
+  registerPlaceholderScreen();
+  mountApp();
+  installResponsiveNav();
+
+  navigate(getState().flags.starterGewaehlt ? 'zuhause' : 'zuhause');
+
+  // 4. Abwesenheit + Loop -------------------------------------------------
+  catchUp();
+  startLoop();
+
+  if (error) toast(error, { icon: '⚠️', type: 'bad', duration: 5000 });
+  if (isNew) toast('Willkommen im Fabelgarten!', { icon: '🌿', type: 'good' });
+}
+
+/** Vorläufiger Bildschirm — wird in den folgenden Ausbaustufen ersetzt. */
+function registerPlaceholderScreen() {
+  registerScreen({
+    id: 'zuhause',
+    label: 'Zuhause',
+    icon: '🏡',
+    order: 10,
+    primary: true,
+    render: () =>
+      h(
+        'div.card',
+        h('h1', 'Fabelgarten'),
+        h('p.muted', 'Das Fundament steht. Die Spielinhalte folgen.')
+      ),
+  });
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', boot);
+} else {
+  boot();
+}
+
+});
+
+__define("src/core/util.js", function(__exports, __require){
+/**
+ * util.js — Kleine Helfer ohne Spiel-Logik: Zahlen, Zeit, DOM.
+ * Bewusst abhängigkeitsfrei, damit jedes andere Modul sie gefahrlos nutzen kann.
+ */
+
+// --- Zahlen ----------------------------------------------------------------
+
+/** Begrenzt einen Wert auf [min, max]. */
+function clamp(value, min = 0, max = 100) {
+  return value < min ? min : value > max ? max : value;
+}
+
+/** Lineare Interpolation. */
+function lerp(a, b, t) {
+  return a + (b - a) * t;
+}
+
+/** Rundet auf eine Nachkommastelle — reicht für alle Anzeigewerte im Spiel. */
+function round1(value) {
+  return Math.round(value * 10) / 10;
+}
+
+/** 1234567 -> "1.234.567" (deutsches Format). */
+function formatNumber(value) {
+  return Math.floor(value).toLocaleString('de-DE');
+}
+
+/** Kompakte Darstellung für große Zahlen: 15300 -> "15,3 Tsd". */
+function formatCompact(value) {
+  if (value < 10000) return formatNumber(value);
+  if (value < 1000000) return (value / 1000).toFixed(1).replace('.', ',') + ' Tsd';
+  return (value / 1000000).toFixed(1).replace('.', ',') + ' Mio';
+}
+
+/** Prozentwert für Balkenbreiten. */
+function percent(value, max) {
+  return max <= 0 ? 0 : clamp((value / max) * 100, 0, 100);
+}
+
+// --- Zeit ------------------------------------------------------------------
+
+const SECOND = 1000;
+const MINUTE = 60 * SECOND;
+const HOUR = 60 * MINUTE;
+const DAY = 24 * HOUR;
+
+/** "2 Std 14 Min", "45 Sek", "3 Tage 2 Std" — für Anzeigen mit viel Platz. */
+function formatDuration(ms) {
+  if (ms <= 0) return 'fertig';
+  const days = Math.floor(ms / DAY);
+  const hours = Math.floor((ms % DAY) / HOUR);
+  const minutes = Math.floor((ms % HOUR) / MINUTE);
+  const seconds = Math.floor((ms % MINUTE) / SECOND);
+
+  if (days > 0) return `${days} ${days === 1 ? 'Tag' : 'Tage'} ${hours} Std`;
+  if (hours > 0) return `${hours} Std ${minutes} Min`;
+  if (minutes > 0) return `${minutes} Min ${seconds} Sek`;
+  return `${seconds} Sek`;
+}
+
+/** "01:23:45" oder "23:45" — für Timer mit wenig Platz. */
+function formatClock(ms) {
+  const total = Math.max(0, Math.floor(ms / SECOND));
+  const h = Math.floor(total / 3600);
+  const m = Math.floor((total % 3600) / 60);
+  const s = total % 60;
+  const pad = (n) => String(n).padStart(2, '0');
+  return h > 0 ? `${pad(h)}:${pad(m)}:${pad(s)}` : `${pad(m)}:${pad(s)}`;
+}
+
+/** Datumsschlüssel der lokalen Zeitzone: "2026-08-06". Basis für Tagesaufgaben. */
+function dayKey(date = new Date()) {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, '0');
+  const d = String(date.getDate()).padStart(2, '0');
+  return `${y}-${m}-${d}`;
+}
+
+/** Tageszeit als Spielbegriff — beeinflusst Entwicklungen und seltene Ereignisse. */
+function timeOfDay(date = new Date()) {
+  const hour = date.getHours();
+  if (hour >= 5 && hour < 11) return 'morgen';
+  if (hour >= 11 && hour < 17) return 'tag';
+  if (hour >= 17 && hour < 22) return 'abend';
+  return 'nacht';
+}
+
+/** Jahreszeit für saisonale Haustiere. */
+function season(date = new Date()) {
+  const month = date.getMonth();
+  if (month <= 1 || month === 11) return 'winter';
+  if (month <= 4) return 'fruehling';
+  if (month <= 7) return 'sommer';
+  return 'herbst';
+}
+
+/** Millisekunden bis zur nächsten lokalen Mitternacht. */
+function msUntilMidnight(now = Date.now()) {
+  const next = new Date(now);
+  next.setHours(24, 0, 0, 0);
+  return next.getTime() - now;
+}
+
+// --- Sonstiges -------------------------------------------------------------
+
+let idCounter = 0;
+
+/** Eindeutige, kurze ID für Haustiere, Eier und Expeditionen. */
+function uid(prefix = 'id') {
+  idCounter += 1;
+  return `${prefix}_${Date.now().toString(36)}${idCounter.toString(36)}${Math.floor(
+    Math.random() * 1296
+  ).toString(36)}`;
+}
+
+/** Tiefe Kopie über strukturiertes Klonen mit JSON-Rückfallweg. */
+function deepClone(value) {
+  if (typeof structuredClone === 'function') return structuredClone(value);
+  return JSON.parse(JSON.stringify(value));
+}
+
+/** Verzögert wiederholte Aufrufe — genutzt für das Autosave. */
+function debounce(fn, wait) {
+  let timer = null;
+  const wrapped = (...args) => {
+    clearTimeout(timer);
+    timer = setTimeout(() => fn(...args), wait);
+  };
+  wrapped.flush = (...args) => {
+    if (timer) {
+      clearTimeout(timer);
+      timer = null;
+      fn(...args);
+    }
+  };
+  wrapped.cancel = () => clearTimeout(timer);
+  return wrapped;
+}
+
+/** Erster Buchstabe groß. */
+function capitalize(text) {
+  return text ? text[0].toUpperCase() + text.slice(1) : text;
+}
+
+/** Summiert die Werte eines Objekts. */
+function sumValues(obj) {
+  return Object.values(obj).reduce((a, b) => a + b, 0);
+}
+
+// --- DOM -------------------------------------------------------------------
+
+/**
+ * Kleiner Hyperscript-Helfer.
+ *
+ *   h('div.card', { onclick: fn }, 'Text', h('span', 'mehr'))
+ *
+ * Der Tag darf Klassen als CSS-Kurzform enthalten ("button.btn.btn--primary").
+ * Attribute: `class`, `style` (Objekt oder String), `dataset`, `on<event>`,
+ * alles andere wird als Attribut gesetzt (bzw. als Property, wenn sinnvoll).
+ */
+function h(tag, props, ...children) {
+  const [name, ...classes] = String(tag).split('.');
+  const node = document.createElement(name || 'div');
+  if (classes.length) node.classList.add(...classes);
+
+  if (props && (typeof props !== 'object' || props instanceof Node || Array.isArray(props))) {
+    children.unshift(props);
+    props = null;
+  }
+
+  if (props) {
+    for (const [key, value] of Object.entries(props)) {
+      if (value === null || value === undefined || value === false) continue;
+
+      if (key === 'class' || key === 'className') {
+        node.classList.add(...String(value).split(/\s+/).filter(Boolean));
+      } else if (key === 'style' && typeof value === 'object') {
+        Object.assign(node.style, value);
+      } else if (key === 'dataset') {
+        Object.assign(node.dataset, value);
+      } else if (key.startsWith('on') && typeof value === 'function') {
+        node.addEventListener(key.slice(2).toLowerCase(), value);
+      } else if (key === 'html') {
+        node.innerHTML = value;
+      } else if (key === 'value' || key === 'checked' || key === 'disabled') {
+        node[key] = value;
+      } else {
+        node.setAttribute(key, value === true ? '' : String(value));
+      }
+    }
+  }
+
+  appendChildren(node, children);
+  return node;
+}
+
+function appendChildren(node, children) {
+  for (const child of children) {
+    if (child === null || child === undefined || child === false || child === true) continue;
+    if (Array.isArray(child)) appendChildren(node, child);
+    else if (child instanceof Node) node.appendChild(child);
+    else node.appendChild(document.createTextNode(String(child)));
+  }
+}
+
+/** Entfernt alle Kinder eines Elements. */
+function clear(node) {
+  while (node.firstChild) node.removeChild(node.firstChild);
+}
+
+/** Ersetzt den Inhalt eines Elements. */
+function replace(node, ...children) {
+  clear(node);
+  appendChildren(node, children);
+  return node;
+}
+
+function qs(selector, root = document) {
+  return root.querySelector(selector);
+}
+
+function qsa(selector, root = document) {
+  return Array.from(root.querySelectorAll(selector));
+}
+
+/** SVG-Element erzeugen (h() kann das nicht, weil SVG einen Namensraum braucht). */
+function svg(tag, attrs = {}, ...children) {
+  const node = document.createElementNS('http://www.w3.org/2000/svg', tag);
+  for (const [key, value] of Object.entries(attrs)) {
+    if (value === null || value === undefined || value === false) continue;
+    node.setAttribute(key, String(value));
+  }
+  for (const child of children.flat()) {
+    if (child instanceof Node) node.appendChild(child);
+    else if (child !== null && child !== undefined) node.appendChild(document.createTextNode(String(child)));
+  }
+  return node;
+}
+
+__exports["clamp"] = clamp;
+__exports["lerp"] = lerp;
+__exports["round1"] = round1;
+__exports["formatNumber"] = formatNumber;
+__exports["formatCompact"] = formatCompact;
+__exports["percent"] = percent;
+__exports["SECOND"] = SECOND;
+__exports["MINUTE"] = MINUTE;
+__exports["HOUR"] = HOUR;
+__exports["DAY"] = DAY;
+__exports["formatDuration"] = formatDuration;
+__exports["formatClock"] = formatClock;
+__exports["dayKey"] = dayKey;
+__exports["timeOfDay"] = timeOfDay;
+__exports["season"] = season;
+__exports["msUntilMidnight"] = msUntilMidnight;
+__exports["uid"] = uid;
+__exports["deepClone"] = deepClone;
+__exports["debounce"] = debounce;
+__exports["capitalize"] = capitalize;
+__exports["sumValues"] = sumValues;
+__exports["h"] = h;
+__exports["clear"] = clear;
+__exports["replace"] = replace;
+__exports["qs"] = qs;
+__exports["qsa"] = qsa;
+__exports["svg"] = svg;
+});
+
+__define("src/ui/components/toast.js", function(__exports, __require){
+/**
+ * toast.js — Kurze Rückmeldungen am unteren Bildschirmrand.
+ * Bewusst schlicht: eine Zeile, ein Symbol, verschwindet von selbst.
+ */
+
+const { h } = __require("src/core/util.js");
+
+const MAX_VISIBLE = 4;
+
+function root() {
+  return document.getElementById('toast-root');
+}
+
+/**
+ * Zeigt einen Hinweis.
+ * @param {string} message Text
+ * @param {{icon?:string, type?:'info'|'good'|'bad'|'rare', duration?:number}} [options]
+ */
+function toast(message, options = {}) {
+  const { icon = '', type = 'info', duration = 2600 } = options;
+  const host = root();
+  if (!host) return;
+
+  // Ältere Hinweise wegräumen, damit der Bildschirm nicht zuläuft.
+  while (host.children.length >= MAX_VISIBLE) {
+    host.firstElementChild.remove();
+  }
+
+  const node = h(
+    'div.toast',
+    { class: `toast--${type}`, role: 'status' },
+    icon ? h('span', { 'aria-hidden': 'true' }, icon) : null,
+    h('span', message)
+  );
+
+  host.appendChild(node);
+
+  setTimeout(() => {
+    node.classList.add('toast--leaving');
+    setTimeout(() => node.remove(), 300);
+  }, duration);
+}
+
+/** Hinweis über einen Fund — hebt Seltenes hervor. */
+function toastReward(text, icon = '🎁', rare = false) {
+  toast(text, { icon, type: rare ? 'rare' : 'good', duration: rare ? 3600 : 2600 });
+}
+
+__exports["toast"] = toast;
+__exports["toastReward"] = toastReward;
+});
+
+__define("src/ui/router.js", function(__exports, __require){
+/**
+ * router.js — Bildschirm-Verwaltung.
+ *
+ * Bildschirme melden sich hier an, die Hülle (`app.js`) fragt sie ab.
+ * Diese Trennung verhindert Ringabhängigkeiten: Bildschirme dürfen den Router
+ * importieren, ohne die App-Hülle zu kennen.
+ */
+
+const { emit, EVENTS } = __require("src/core/events.js");
+
+/**
+ * @typedef {object} ScreenDef
+ * @property {string} id            eindeutiger Schlüssel, z. B. 'zuhause'
+ * @property {string} label         Beschriftung in der Navigation
+ * @property {string} icon          Emoji für die Navigation
+ * @property {number} [order]       Sortierung in der Navigation
+ * @property {boolean} [primary]    erscheint auf dem Smartphone in der Bodenleiste
+ * @property {boolean} [hidden]     taucht gar nicht in der Navigation auf
+ * @property {boolean} [live]       bei Zustandsänderungen neu zeichnen (Standard: true)
+ * @property {(params:object)=>Node} render   liefert den Inhalt
+ * @property {()=>string|number|null} [badge] kleine Zahl/Punkt an der Navigation
+ * @property {()=>void} [onLeave]   Aufräumen beim Verlassen
+ */
+
+const screens = new Map();
+let currentId = null;
+let currentParams = {};
+
+/** @param {ScreenDef} def */
+function registerScreen(def) {
+  screens.set(def.id, { order: 50, live: true, primary: false, hidden: false, ...def });
+}
+
+function getScreen(id) {
+  return screens.get(id) || null;
+}
+
+/** Alle Bildschirme in Navigationsreihenfolge. */
+function allScreens() {
+  return [...screens.values()].sort((a, b) => a.order - b.order);
+}
+
+/** Bildschirme, die in der Navigation auftauchen. */
+function navScreens() {
+  return allScreens().filter((screen) => !screen.hidden);
+}
+
+function currentScreenId() {
+  return currentId;
+}
+
+function currentScreenParams() {
+  return currentParams;
+}
+
+/**
+ * Wechselt den Bildschirm.
+ * @param {string} id
+ * @param {object} [params] wird an `render` weitergereicht
+ */
+function navigate(id, params = {}) {
+  if (!screens.has(id)) {
+    console.warn(`Unbekannter Bildschirm: ${id}`);
+    return;
+  }
+  if (currentId === id && JSON.stringify(params) === JSON.stringify(currentParams)) {
+    emit(EVENTS.SCREEN_CHANGED, { id, params, same: true });
+    return;
+  }
+
+  const previous = screens.get(currentId);
+  previous?.onLeave?.();
+
+  currentId = id;
+  currentParams = params;
+  emit(EVENTS.SCREEN_CHANGED, { id, params, same: false });
+}
+
+/** Erzwingt ein Neuzeichnen des aktuellen Bildschirms. */
+function refresh() {
+  emit(EVENTS.SCREEN_CHANGED, { id: currentId, params: currentParams, same: true, refresh: true });
+}
+
+__exports["registerScreen"] = registerScreen;
+__exports["getScreen"] = getScreen;
+__exports["allScreens"] = allScreens;
+__exports["navScreens"] = navScreens;
+__exports["currentScreenId"] = currentScreenId;
+__exports["currentScreenParams"] = currentScreenParams;
+__exports["navigate"] = navigate;
+__exports["refresh"] = refresh;
+});
+
+__define("src/core/events.js", function(__exports, __require){
+/**
+ * events.js — Winziger Ereignis-Bus.
+ *
+ * Die Systeme kennen die UI nicht. Wenn etwas Bemerkenswertes passiert
+ * (Level-Up, neues Haustier, Erfolg freigeschaltet), melden sie es hier;
+ * UI, Statistik und Erfolgs-System hören zu. Das hält die Module entkoppelt.
+ */
+
+const listeners = new Map();
+
+/**
+ * Hört auf ein Ereignis.
+ * @returns {Function} Abmelde-Funktion
+ */
+function on(type, handler) {
+  if (!listeners.has(type)) listeners.set(type, new Set());
+  listeners.get(type).add(handler);
+  return () => off(type, handler);
+}
+
+/** Hört genau einmal auf ein Ereignis. */
+function once(type, handler) {
+  const unsubscribe = on(type, (payload) => {
+    unsubscribe();
+    handler(payload);
+  });
+  return unsubscribe;
+}
+
+function off(type, handler) {
+  listeners.get(type)?.delete(handler);
+}
+
+/** Löst ein Ereignis aus. Fehler eines Hörers stoppen die anderen nicht. */
+function emit(type, payload) {
+  const set = listeners.get(type);
+  if (!set) return;
+  for (const handler of [...set]) {
+    try {
+      handler(payload);
+    } catch (error) {
+      console.error(`Fehler im Ereignis-Hörer für "${type}":`, error);
+    }
+  }
+}
+
+/** Nur für Tests / Neustart des Spielstands. */
+function clearAll() {
+  listeners.clear();
+}
+
+/**
+ * Bekannte Ereignisnamen an einer Stelle — verhindert Tippfehler und dient
+ * gleichzeitig als Übersicht darüber, was im Spiel überhaupt passieren kann.
+ */
+const EVENTS = {
+  STATE_CHANGED: 'state:changed',
+  SCREEN_CHANGED: 'screen:changed',
+
+  PET_OBTAINED: 'pet:obtained',
+  PET_LEVEL_UP: 'pet:levelup',
+  PET_EVOLVED: 'pet:evolved',
+  PET_ACTION: 'pet:action',
+  PET_MOOD_CRITICAL: 'pet:moodCritical',
+  PET_RELEASED: 'pet:released',
+
+  EGG_FOUND: 'egg:found',
+  EGG_HATCHED: 'egg:hatched',
+
+  ITEM_GAINED: 'item:gained',
+  ITEM_USED: 'item:used',
+
+  COINS_CHANGED: 'coins:changed',
+  DIAMONDS_CHANGED: 'diamonds:changed',
+
+  EXPEDITION_STARTED: 'expedition:started',
+  EXPEDITION_DONE: 'expedition:done',
+
+  MINIGAME_FINISHED: 'minigame:finished',
+  QUEST_PROGRESS: 'quest:progress',
+  QUEST_COMPLETED: 'quest:completed',
+  ACHIEVEMENT_UNLOCKED: 'achievement:unlocked',
+
+  ROOM_UNLOCKED: 'room:unlocked',
+  RARE_EVENT: 'event:rare',
+  DAY_ROLLOVER: 'day:rollover',
+};
+
+__exports["on"] = on;
+__exports["once"] = once;
+__exports["off"] = off;
+__exports["emit"] = emit;
+__exports["clearAll"] = clearAll;
+__exports["EVENTS"] = EVENTS;
+});
+
+__define("src/ui/app.js", function(__exports, __require){
+/**
+ * app.js — Die Hülle: Kopfleiste, Navigation, Bildschirmfläche.
+ *
+ * Zeichnet nur, was sich geändert hat: Kopfleiste und Navigation werden
+ * punktuell aktualisiert, der Bildschirm bei Zustandsänderungen neu gebaut
+ * (die Bildschirme sind klein genug, dass sich Feinarbeit dort nicht lohnt).
+ */
+
+const { h, replace, formatCompact } = __require("src/core/util.js");
+const { getState, subscribe } = __require("src/core/state.js");
+const { on, EVENTS } = __require("src/core/events.js");
+const { navScreens, getScreen, currentScreenId, currentScreenParams, navigate } = __require("src/ui/router.js");
+
+let elements = null;
+let pendingRender = false;
+
+/** Baut das Grundgerüst und hängt alle Hörer ein. Einmal beim Start aufrufen. */
+function mountApp() {
+  const app = document.getElementById('app');
+
+  const wallet = h('div.topbar__wallet');
+  const themeButton = h(
+    'button.btn.btn--ghost.btn--icon',
+    { onclick: toggleTheme, 'aria-label': 'Helles oder dunkles Design wechseln', title: 'Design wechseln' },
+    themeIcon()
+  );
+
+  const topbar = h(
+    'header.topbar',
+    h(
+      'div.topbar__brand',
+      h('span', { 'aria-hidden': 'true' }, '🌿'),
+      h('span', 'Fabelgarten')
+    ),
+    h('div.topbar__spacer'),
+    wallet,
+    themeButton
+  );
+
+  const screen = h('main.screen', { id: 'screen', tabindex: '-1' });
+  const nav = h('nav.nav', { 'aria-label': 'Hauptnavigation' });
+
+  replace(app, topbar, screen, nav);
+  app.hidden = false;
+  document.getElementById('boot')?.remove();
+
+  elements = { app, topbar, wallet, themeButton, screen, nav };
+
+  buildNav();
+  renderWallet();
+  applyTheme(getState().einstellungen.theme);
+  applyMotion(getState().einstellungen.bewegung);
+
+  on(EVENTS.SCREEN_CHANGED, () => {
+    buildNav();
+    renderScreen();
+    elements.screen.scrollTo?.({ top: 0 });
+  });
+
+  subscribe(() => {
+    renderWallet();
+    updateNavBadges();
+    const screenDef = getScreen(currentScreenId());
+    if (screenDef?.live) scheduleRender();
+  });
+
+  return elements;
+}
+
+// --- Bildschirm ------------------------------------------------------------
+
+/** Sammelt mehrere Änderungen zu einem Neuzeichnen. */
+function scheduleRender() {
+  if (pendingRender) return;
+  pendingRender = true;
+  requestAnimationFrame(() => {
+    pendingRender = false;
+    renderScreen();
+  });
+}
+
+function renderScreen() {
+  const def = getScreen(currentScreenId());
+  if (!def || !elements) return;
+
+  const content = def.render(currentScreenParams());
+  replace(elements.screen, content);
+}
+
+// --- Kopfleiste ------------------------------------------------------------
+
+function renderWallet() {
+  if (!elements) return;
+  const { spieler } = getState();
+  replace(
+    elements.wallet,
+    h('span.chip.chip--wallet', { title: 'Münzen' }, h('span', { 'aria-hidden': 'true' }, '🪙'), formatCompact(spieler.muenzen)),
+    h('span.chip.chip--wallet', { title: 'Diamanten' }, h('span', { 'aria-hidden': 'true' }, '💎'), formatCompact(spieler.diamanten))
+  );
+}
+
+// --- Navigation ------------------------------------------------------------
+
+function buildNav() {
+  if (!elements) return;
+  const isDesktop = window.matchMedia('(min-width: 900px)').matches;
+  const screens = navScreens();
+  const active = currentScreenId();
+
+  // Auf dem Smartphone zeigt die Bodenleiste nur die wichtigsten Ziele
+  // plus einen „Mehr“-Knopf, der den Rest als Blatt öffnet.
+  const visible = isDesktop ? screens : screens.filter((s) => s.primary || s.id === active);
+
+  const items = visible.map((screen) =>
+    h(
+      'button.nav__item',
+      {
+        onclick: () => navigate(screen.id),
+        'aria-current': screen.id === active ? 'page' : null,
+        'data-screen': screen.id,
+      },
+      h('span.nav__icon', { 'aria-hidden': 'true' }, screen.icon),
+      h('span', screen.label),
+      badgeNode(screen)
+    )
+  );
+
+  if (!isDesktop) {
+    items.push(
+      h(
+        'button.nav__item',
+        { onclick: openMoreSheet, 'aria-label': 'Weitere Bereiche' },
+        h('span.nav__icon', { 'aria-hidden': 'true' }, '⋯'),
+        h('span', 'Mehr')
+      )
+    );
+  }
+
+  replace(elements.nav, items);
+}
+
+function badgeNode(screen) {
+  const value = screen.badge?.();
+  if (!value) return null;
+  return h('span.nav__badge', String(value));
+}
+
+function updateNavBadges() {
+  if (!elements) return;
+  for (const screen of navScreens()) {
+    const item = elements.nav.querySelector(`[data-screen="${screen.id}"]`);
+    if (!item) continue;
+    item.querySelector('.nav__badge')?.remove();
+    const badge = badgeNode(screen);
+    if (badge) item.appendChild(badge);
+  }
+}
+
+/** Blatt mit allen Bereichen (nur Smartphone). */
+function openMoreSheet() {
+  // Absichtlich ohne modal.js-Import, um Ringabhängigkeiten zu vermeiden:
+  // dieses Blatt ist Teil der Navigation, kein inhaltlicher Dialog.
+  const existing = document.querySelector('.more-sheet');
+  if (existing) {
+    existing.remove();
+    return;
+  }
+
+  const sheet = h(
+    'div.modal-backdrop.more-sheet',
+    {
+      onclick: (event) => {
+        if (event.target === sheet) sheet.remove();
+      },
+    },
+    h(
+      'div.modal',
+      { style: { width: 'min(520px, 100%)' } },
+      h('div.modal__head', h('h2', 'Alle Bereiche')),
+      h(
+        'div.grid.grid--tiles',
+        navScreens().map((screen) =>
+          h(
+            'button.tile',
+            {
+              onclick: () => {
+                sheet.remove();
+                navigate(screen.id);
+              },
+            },
+            h('span.tile__icon', { 'aria-hidden': 'true' }, screen.icon),
+            h('span.tile__label', screen.label),
+            (() => {
+              const value = screen.badge?.();
+              return value ? h('span.tile__count', String(value)) : null;
+            })()
+          )
+        )
+      )
+    )
+  );
+
+  document.getElementById('modal-root').appendChild(sheet);
+}
+
+// --- Design ----------------------------------------------------------------
+
+function themeIcon() {
+  return document.documentElement.dataset.theme === 'light' ? '🌙' : '☀️';
+}
+
+function applyTheme(theme) {
+  const resolved =
+    theme === 'system'
+      ? window.matchMedia('(prefers-color-scheme: light)').matches
+        ? 'light'
+        : 'dark'
+      : theme;
+  document.documentElement.dataset.theme = resolved;
+  if (elements) replace(elements.themeButton, themeIcon());
+}
+
+function applyMotion(mode) {
+  document.documentElement.dataset.motion = mode === 'reduziert' ? 'reduced' : 'full';
+}
+
+function toggleTheme() {
+  const next = document.documentElement.dataset.theme === 'light' ? 'dark' : 'light';
+  applyTheme(next);
+  // Direktes Schreiben ohne update(), um kein volles Neuzeichnen auszulösen.
+  getState().einstellungen.theme = next;
+}
+
+/** Reagiert auf Größenänderungen: Bodenleiste ↔ Seitenleiste. */
+function installResponsiveNav() {
+  const query = window.matchMedia('(min-width: 900px)');
+  query.addEventListener('change', buildNav);
+}
+
+__exports["mountApp"] = mountApp;
+__exports["applyTheme"] = applyTheme;
+__exports["applyMotion"] = applyMotion;
+__exports["installResponsiveNav"] = installResponsiveNav;
+});
+
+__define("src/core/state.js", function(__exports, __require){
+/**
+ * state.js — Der eine Spielstand und der Zugriff darauf.
+ *
+ * Alles, was das Spiel weiß, steckt in einem einzigen serialisierbaren Objekt.
+ * Änderungen laufen immer über `update()`; danach wird einmal pro Bild ein
+ * Änderungs-Ereignis gesendet, damit die UI nicht bei jeder Kleinigkeit
+ * neu zeichnet.
+ */
+
+const { emit, EVENTS } = __require("src/core/events.js");
+const { dayKey, uid } = __require("src/core/util.js");
+
+/** Wird bei jeder inkompatiblen Änderung am Spielstand erhöht (siehe storage.js). */
+const SAVE_VERSION = 1;
+
+/** Maximale Teamgröße. Weitere Haustiere leben im Gehege. */
+const TEAM_SIZE = 6;
+
+/** Erzeugt einen frischen Spielstand. */
+function createNewSave() {
+  const now = Date.now();
+  return {
+    version: SAVE_VERSION,
+    createdAt: now,
+    lastSeen: now,
+    seed: Math.floor(Math.random() * 0xffffffff),
+
+    /** Fortschritt des Spielers selbst. */
+    spieler: {
+      name: 'Hüter',
+      muenzen: 250,
+      diamanten: 5,
+      rang: 1,
+      rangXp: 0,
+    },
+
+    /** Alle Haustiere im Besitz — `team` verweist per ID auf höchstens sechs davon. */
+    haustiere: [],
+    team: [],
+    aktivesHaustier: null,
+    lieblingsHaustier: null,
+
+    /** Gegenstände als `{ itemId: Anzahl }`. */
+    inventar: {},
+
+    /** Eier im Brutkasten. */
+    eier: [],
+    brutplaetze: 2,
+
+    /** Laufende Expeditionen. */
+    expeditionen: [],
+
+    /** Haustierbuch: `{ speciesId: { gesehen, gefangen, anzahl, ersteBegegnung } }` */
+    buch: {},
+
+    /** Zuhause: freigeschaltete Räume und gekaufte Möbel. */
+    zuhause: {
+      raeume: { schlafzimmer: true },
+      moebel: {},
+    },
+
+    /** Tagesaufgaben. */
+    aufgaben: {
+      tag: dayKey(),
+      liste: [],
+      minutenHeute: 0,
+    },
+
+    /** Freigeschaltete Erfolge: `{ id: Zeitstempel }`. */
+    erfolge: {},
+
+    /** Zähler für Erfolge, Statistik und Aufgaben. */
+    statistik: {
+      spielzeitMs: 0,
+      sitzungen: 0,
+      tageGespielt: 1,
+      letzterTag: dayKey(),
+      serie: 1,
+      besteSerie: 1,
+      aktionen: {},
+      aktionenGesamt: 0,
+      minispiele: {},
+      minispieleGewonnen: 0,
+      eierGeschluepft: 0,
+      entwicklungen: 0,
+      expeditionen: 0,
+      muenzenGesamt: 0,
+      diamantenGesamt: 0,
+      fotos: 0,
+    },
+
+    /** Fotogalerie (kleine, komprimierte Bilder). */
+    galerie: [],
+
+    /** Einstellungen. */
+    einstellungen: {
+      theme: 'dark',
+      sound: true,
+      musik: false,
+      lautstaerke: 0.6,
+      bewegung: 'voll',
+      autosave: true,
+    },
+
+    /** Merker für einmalige oder tagesbezogene Ereignisse. */
+    flags: {
+      starterGewaehlt: false,
+      einfuehrungGesehen: false,
+      goldenesEiTag: null,
+      nachtwesenTag: null,
+      saisonPetJahr: null,
+    },
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Zugriff
+// ---------------------------------------------------------------------------
+
+let state = createNewSave();
+let notifyScheduled = false;
+const subscribers = new Set();
+
+/** Der aktuelle Spielstand (nicht direkt verändern — `update()` benutzen). */
+function getState() {
+  return state;
+}
+
+/** Ersetzt den kompletten Spielstand (Laden, Import, Zurücksetzen). */
+function setState(next) {
+  state = next;
+  notify(true);
+}
+
+/**
+ * Ändert den Spielstand.
+ * @param {(state:object)=>void} mutator verändert das Objekt direkt
+ * @param {{silent?:boolean}} [options] `silent` unterdrückt die Benachrichtigung
+ */
+function update(mutator, options = {}) {
+  const result = mutator(state);
+  if (!options.silent) notify();
+  return result;
+}
+
+/**
+ * Abonniert Änderungen. Der Rückgabewert meldet wieder ab.
+ * Die UI nutzt das, um den aktiven Bildschirm neu zu zeichnen.
+ */
+function subscribe(handler) {
+  subscribers.add(handler);
+  return () => subscribers.delete(handler);
+}
+
+/** Sammelt Änderungen und meldet sie höchstens einmal pro Bild. */
+function notify(immediate = false) {
+  if (immediate) {
+    flush();
+    return;
+  }
+  if (notifyScheduled) return;
+  notifyScheduled = true;
+  requestAnimationFrame(flush);
+}
+
+function flush() {
+  notifyScheduled = false;
+  for (const handler of [...subscribers]) {
+    try {
+      handler(state);
+    } catch (error) {
+      console.error('Fehler beim Aktualisieren der Oberfläche:', error);
+    }
+  }
+  emit(EVENTS.STATE_CHANGED, state);
+}
+
+// ---------------------------------------------------------------------------
+// Selektoren — bequemer Lesezugriff für UI und Systeme
+// ---------------------------------------------------------------------------
+
+/** Das gerade betreute Haustier (oder `null`, solange keins gewählt ist). */
+function activePet(s = state) {
+  return s.haustiere.find((pet) => pet.id === s.aktivesHaustier) || s.haustiere[0] || null;
+}
+
+/** Haustier per ID. */
+function petById(id, s = state) {
+  return s.haustiere.find((pet) => pet.id === id) || null;
+}
+
+/** Die Haustiere im Team, in gespeicherter Reihenfolge. */
+function teamPets(s = state) {
+  return s.team.map((id) => petById(id, s)).filter(Boolean);
+}
+
+/** Haustiere außerhalb des Teams — das Gehege. */
+function sanctuaryPets(s = state) {
+  return s.haustiere.filter((pet) => !s.team.includes(pet.id));
+}
+
+/** Anzahl eines Gegenstands im Beutel. */
+function itemCount(itemId, s = state) {
+  return s.inventar[itemId] || 0;
+}
+
+/** Ist ein Raum freigeschaltet? */
+function hasRoom(roomId, s = state) {
+  return Boolean(s.zuhause.raeume[roomId]);
+}
+
+/** Freie Brutplätze. */
+function freeIncubatorSlots(s = state) {
+  return Math.max(0, s.brutplaetze - s.eier.length);
+}
+
+/** Läuft dieses Haustier gerade auf Expedition? */
+function isOnExpedition(petId, s = state) {
+  return s.expeditionen.some((trip) => trip.petId === petId);
+}
+
+/** Erzeugt eine neue ID mit Präfix — hier gebündelt, damit IDs einheitlich aussehen. */
+function newId(prefix) {
+  return uid(prefix);
+}
+
+__exports["SAVE_VERSION"] = SAVE_VERSION;
+__exports["TEAM_SIZE"] = TEAM_SIZE;
+__exports["createNewSave"] = createNewSave;
+__exports["getState"] = getState;
+__exports["setState"] = setState;
+__exports["update"] = update;
+__exports["subscribe"] = subscribe;
+__exports["activePet"] = activePet;
+__exports["petById"] = petById;
+__exports["teamPets"] = teamPets;
+__exports["sanctuaryPets"] = sanctuaryPets;
+__exports["itemCount"] = itemCount;
+__exports["hasRoom"] = hasRoom;
+__exports["freeIncubatorSlots"] = freeIncubatorSlots;
+__exports["isOnExpedition"] = isOnExpedition;
+__exports["newId"] = newId;
+});
+
+__define("src/core/loop.js", function(__exports, __require){
+/**
+ * loop.js — Der Herzschlag des Spiels.
+ *
+ * Ein einziger `requestAnimationFrame`-Loop treibt alles an. Die Simulation
+ * läuft in festen Sekundenschritten, damit Bedürfnisse unabhängig von der
+ * Bildrate gleich schnell sinken. Ist der Tab im Hintergrund, pausiert der
+ * Browser den Loop — die verlorene Zeit wird beim Zurückkommen nachgerechnet
+ * (siehe `catchUp`).
+ */
+
+const { getState, update } = __require("src/core/state.js");
+const { emit, EVENTS } = __require("src/core/events.js");
+const { dayKey, HOUR } = __require("src/core/util.js");
+
+/** Länge eines Simulationsschritts. */
+const TICK_MS = 1000;
+
+/**
+ * Höchstens so viel Abwesenheit wird nachsimuliert. Wer eine Woche weg war,
+ * findet seine Haustiere hungrig vor — aber nicht am Boden zerstört. Das
+ * Spiel soll zum Zurückkommen einladen, nicht bestrafen.
+ */
+const OFFLINE_CAP_MS = 12 * HOUR;
+
+const tickHandlers = new Set();
+const frameHandlers = new Set();
+
+let running = false;
+let rafId = null;
+let accumulator = 0;
+let lastFrame = 0;
+
+/**
+ * Meldet eine Funktion an, die jede Spielsekunde läuft.
+ * @param {(seconds:number, state:object)=>void} handler
+ * @returns {Function} Abmelde-Funktion
+ */
+function onTick(handler) {
+  tickHandlers.add(handler);
+  return () => tickHandlers.delete(handler);
+}
+
+/**
+ * Meldet eine Funktion an, die jedes Bild läuft (für weiche Anzeigen wie Timer).
+ * @param {(dtMs:number)=>void} handler
+ */
+function onFrame(handler) {
+  frameHandlers.add(handler);
+  return () => frameHandlers.delete(handler);
+}
+
+function startLoop() {
+  if (running) return;
+  running = true;
+  lastFrame = performance.now();
+  rafId = requestAnimationFrame(frame);
+}
+
+function stopLoop() {
+  running = false;
+  if (rafId) cancelAnimationFrame(rafId);
+  rafId = null;
+}
+
+function frame(now) {
+  if (!running) return;
+  const dt = Math.min(now - lastFrame, 1000); // Ausreißer nach Tab-Wechsel kappen
+  lastFrame = now;
+
+  for (const handler of frameHandlers) {
+    try {
+      handler(dt);
+    } catch (error) {
+      console.error('Fehler im Bild-Handler:', error);
+    }
+  }
+
+  accumulator += dt;
+  let steps = 0;
+  while (accumulator >= TICK_MS && steps < 10) {
+    accumulator -= TICK_MS;
+    steps += 1;
+    runTick(1);
+  }
+
+  rafId = requestAnimationFrame(frame);
+}
+
+/** Führt einen Simulationsschritt aus. `seconds` kann beim Nachrechnen größer als 1 sein. */
+function runTick(seconds) {
+  const state = getState();
+  for (const handler of tickHandlers) {
+    try {
+      handler(seconds, state);
+    } catch (error) {
+      console.error('Fehler im Tick-Handler:', error);
+    }
+  }
+}
+
+/**
+ * Rechnet die Abwesenheit seit dem letzten Besuch nach.
+ * Wird einmal beim Start aufgerufen, bevor der Loop läuft.
+ *
+ * @returns {{elapsedMs:number, simulatedMs:number, cappedMs:number}}
+ */
+function catchUp() {
+  const state = getState();
+  const now = Date.now();
+  const elapsed = Math.max(0, now - (state.lastSeen || now));
+  const simulated = Math.min(elapsed, OFFLINE_CAP_MS);
+
+  if (simulated > 5000) {
+    // In groben Blöcken nachrechnen: genau genug und in Sekundenbruchteilen erledigt.
+    const blockSeconds = 60;
+    let remaining = Math.floor(simulated / 1000);
+    while (remaining > 0) {
+      const step = Math.min(blockSeconds, remaining);
+      runTick(step);
+      remaining -= step;
+    }
+  }
+
+  update((s) => {
+    s.lastSeen = now;
+  }, { silent: true });
+
+  return { elapsedMs: elapsed, simulatedMs: simulated, cappedMs: Math.max(0, elapsed - simulated) };
+}
+
+/**
+ * Prüft den Tageswechsel. Läuft im Tick mit, weil das Spiel über Mitternacht
+ * hinaus offen bleiben kann.
+ */
+function installDayWatcher() {
+  return onTick(() => {
+    const state = getState();
+    const today = dayKey();
+    if (state.statistik.letzterTag === today) return;
+
+    const previous = state.statistik.letzterTag;
+    update((s) => {
+      const gestern = new Date();
+      gestern.setDate(gestern.getDate() - 1);
+      const warGestern = previous === dayKey(gestern);
+
+      s.statistik.serie = warGestern ? s.statistik.serie + 1 : 1;
+      s.statistik.besteSerie = Math.max(s.statistik.besteSerie, s.statistik.serie);
+      s.statistik.tageGespielt += 1;
+      s.statistik.letzterTag = today;
+    });
+
+    emit(EVENTS.DAY_ROLLOVER, { tag: today, vorher: previous });
+  });
+}
+
+/** Zählt die Spielzeit mit — nur solange der Tab sichtbar ist. */
+function installPlaytimeTracker() {
+  return onTick((seconds) => {
+    if (document.visibilityState !== 'visible') return;
+    update(
+      (s) => {
+        s.statistik.spielzeitMs += seconds * 1000;
+        s.aufgaben.minutenHeute += seconds / 60;
+      },
+      { silent: true }
+    );
+  });
+}
+
+__exports["OFFLINE_CAP_MS"] = OFFLINE_CAP_MS;
+__exports["onTick"] = onTick;
+__exports["onFrame"] = onFrame;
+__exports["startLoop"] = startLoop;
+__exports["stopLoop"] = stopLoop;
+__exports["catchUp"] = catchUp;
+__exports["installDayWatcher"] = installDayWatcher;
+__exports["installPlaytimeTracker"] = installPlaytimeTracker;
+});
+
+__define("src/core/storage.js", function(__exports, __require){
+/**
+ * storage.js — Spielstand sichern, laden, sichern lassen (Backup) und zurücksetzen.
+ *
+ * Es gibt genau einen LocalStorage-Schlüssel. Beim Laden wird der gespeicherte
+ * Stand über einen frischen Standard-Spielstand gelegt: dadurch tauchen neue
+ * Felder späterer Spielversionen automatisch mit sinnvollen Werten auf, ohne
+ * dass alte Spielstände kaputtgehen.
+ */
+
+const { createNewSave, SAVE_VERSION, getState, setState } = __require("src/core/state.js");
+const { debounce, dayKey } = __require("src/core/util.js");
+
+const SAVE_KEY = 'fabelgarten.save';
+const BACKUP_KEY = 'fabelgarten.save.backup';
+
+/** Ist LocalStorage überhaupt benutzbar? (Privater Modus, deaktivierte Cookies …) */
+function storageAvailable() {
+  try {
+    const probe = '__fg_test__';
+    localStorage.setItem(probe, '1');
+    localStorage.removeItem(probe);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Laden
+// ---------------------------------------------------------------------------
+
+/**
+ * Lädt den Spielstand.
+ * @returns {{save:object, isNew:boolean, error:string|null}}
+ */
+function loadSave() {
+  if (!storageAvailable()) {
+    return { save: createNewSave(), isNew: true, error: 'Speichern ist in diesem Browser nicht möglich.' };
+  }
+
+  const raw = localStorage.getItem(SAVE_KEY);
+  if (!raw) return { save: createNewSave(), isNew: true, error: null };
+
+  try {
+    const parsed = JSON.parse(raw);
+    return { save: prepare(parsed), isNew: false, error: null };
+  } catch (error) {
+    console.error('Spielstand konnte nicht gelesen werden:', error);
+    // Kaputten Stand nicht wegwerfen — als Notkopie behalten.
+    try {
+      localStorage.setItem(BACKUP_KEY, raw);
+    } catch {
+      /* Platz voll — dann eben nicht. */
+    }
+    return {
+      save: createNewSave(),
+      isNew: true,
+      error: 'Der gespeicherte Fortschritt war beschädigt. Ein neues Spiel wurde gestartet.',
+    };
+  }
+}
+
+/** Migriert und vervollständigt einen geladenen Spielstand. */
+function prepare(parsed) {
+  const migrated = migrate(parsed);
+  return mergeDefaults(createNewSave(), migrated);
+}
+
+/**
+ * Wandelt ältere Spielstände schrittweise um.
+ * Jeder Schritt hebt genau eine Version an — so bleiben die Regeln nachvollziehbar.
+ */
+function migrate(save) {
+  let current = save;
+  let version = Number(current.version) || 0;
+
+  // Beispiel für künftige Schritte:
+  // if (version < 2) { current = migrateV1toV2(current); version = 2; }
+
+  current.version = Math.max(version, SAVE_VERSION);
+  return current;
+}
+
+/**
+ * Legt gespeicherte Werte über die Standardstruktur.
+ * Objekte werden rekursiv zusammengeführt, Listen komplett übernommen.
+ */
+function mergeDefaults(defaults, saved) {
+  if (!isPlainObject(saved)) return defaults;
+  const result = Array.isArray(defaults) ? [] : { ...defaults };
+
+  for (const [key, savedValue] of Object.entries(saved)) {
+    const defaultValue = defaults[key];
+    if (isPlainObject(defaultValue) && isPlainObject(savedValue)) {
+      result[key] = mergeDefaults(defaultValue, savedValue);
+    } else if (savedValue !== undefined) {
+      result[key] = savedValue;
+    }
+  }
+  return result;
+}
+
+function isPlainObject(value) {
+  return Boolean(value) && typeof value === 'object' && !Array.isArray(value);
+}
+
+// ---------------------------------------------------------------------------
+// Speichern
+// ---------------------------------------------------------------------------
+
+let lastSaveAt = 0;
+let saveFailed = false;
+
+/** Schreibt sofort. Wird von `queueSave` und beim Verlassen der Seite genutzt. */
+function saveNow() {
+  const state = getState();
+  if (!state.einstellungen.autosave && !forceNextSave) return false;
+  forceNextSave = false;
+
+  try {
+    state.lastSeen = Date.now();
+    localStorage.setItem(SAVE_KEY, JSON.stringify(state));
+    lastSaveAt = Date.now();
+    saveFailed = false;
+    return true;
+  } catch (error) {
+    // Häufigster Fall: Speicher voll. Galerie ist der größte Brocken.
+    console.error('Speichern fehlgeschlagen:', error);
+    saveFailed = true;
+    return false;
+  }
+}
+
+let forceNextSave = false;
+
+/** Erzwingt das nächste Speichern, auch wenn Autosave aus ist (z. B. Einstellungswechsel). */
+function saveForced() {
+  forceNextSave = true;
+  return saveNow();
+}
+
+/** Entprelltes Autosave — wird nach jeder Zustandsänderung angestoßen. */
+const queueSave = debounce(saveNow, 1500);
+
+function lastSaveTime() {
+  return lastSaveAt;
+}
+
+function hasSaveError() {
+  return saveFailed;
+}
+
+/**
+ * Hängt das Autosave an Zustandsänderungen und an das Verlassen der Seite.
+ * Wird einmalig beim Start aufgerufen.
+ */
+function installAutosave(subscribeFn) {
+  subscribeFn(() => queueSave());
+
+  const flush = () => {
+    queueSave.cancel();
+    saveNow();
+  };
+
+  window.addEventListener('pagehide', flush);
+  window.addEventListener('beforeunload', flush);
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'hidden') flush();
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Backup: Export / Import / Zurücksetzen
+// ---------------------------------------------------------------------------
+
+/** Baut die Backup-Datei als Text. */
+function exportSaveText() {
+  const state = getState();
+  return JSON.stringify(
+    {
+      spiel: 'Fabelgarten',
+      version: state.version,
+      exportiertAm: new Date().toISOString(),
+      daten: state,
+    },
+    null,
+    2
+  );
+}
+
+/** Lädt den Spielstand als `.json`-Datei herunter. */
+function downloadSave() {
+  const text = exportSaveText();
+  const blob = new Blob([text], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = `fabelgarten-${dayKey()}.json`;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
+/**
+ * Übernimmt eine Backup-Datei.
+ * @param {string} text Dateiinhalt
+ * @returns {{ok:boolean, error?:string}}
+ */
+function importSaveText(text) {
+  let parsed;
+  try {
+    parsed = JSON.parse(text);
+  } catch {
+    return { ok: false, error: 'Die Datei ist keine gültige Sicherung (kein lesbares JSON).' };
+  }
+
+  const data = parsed && parsed.daten ? parsed.daten : parsed;
+  const problem = validateSave(data);
+  if (problem) return { ok: false, error: problem };
+
+  // Vor dem Überschreiben eine Notkopie des aktuellen Stands ablegen.
+  try {
+    localStorage.setItem(BACKUP_KEY, JSON.stringify(getState()));
+  } catch {
+    /* egal */
+  }
+
+  setState(prepare(data));
+  saveForced();
+  return { ok: true };
+}
+
+/** Grobe Plausibilitätsprüfung, damit kein Unsinn den Spielstand zerstört. */
+function validateSave(data) {
+  if (!isPlainObject(data)) return 'Die Datei enthält keinen Spielstand.';
+  if (!Array.isArray(data.haustiere)) return 'Im Spielstand fehlt die Liste der Haustiere.';
+  if (!isPlainObject(data.spieler)) return 'Im Spielstand fehlen die Spielerdaten.';
+  if (Number(data.version) > SAVE_VERSION) {
+    return 'Die Sicherung stammt aus einer neueren Spielversion und kann nicht geladen werden.';
+  }
+  return null;
+}
+
+/** Setzt alles zurück und beginnt von vorn. */
+function resetSave() {
+  try {
+    localStorage.setItem(BACKUP_KEY, JSON.stringify(getState()));
+    localStorage.removeItem(SAVE_KEY);
+  } catch {
+    /* egal */
+  }
+  setState(createNewSave());
+  saveForced();
+}
+
+/** Gibt die Größe des Spielstands in kB zurück (für die Statistik-Anzeige). */
+function saveSizeKb() {
+  try {
+    const raw = localStorage.getItem(SAVE_KEY) || '';
+    return Math.round((new Blob([raw]).size / 1024) * 10) / 10;
+  } catch {
+    return 0;
+  }
+}
+
+__exports["SAVE_KEY"] = SAVE_KEY;
+__exports["storageAvailable"] = storageAvailable;
+__exports["loadSave"] = loadSave;
+__exports["saveNow"] = saveNow;
+__exports["saveForced"] = saveForced;
+__exports["queueSave"] = queueSave;
+__exports["lastSaveTime"] = lastSaveTime;
+__exports["hasSaveError"] = hasSaveError;
+__exports["installAutosave"] = installAutosave;
+__exports["exportSaveText"] = exportSaveText;
+__exports["downloadSave"] = downloadSave;
+__exports["importSaveText"] = importSaveText;
+__exports["resetSave"] = resetSave;
+__exports["saveSizeKb"] = saveSizeKb;
+});
+
+__require("src/main.js");
+})();
+  </script>
+</body>
+</html>
