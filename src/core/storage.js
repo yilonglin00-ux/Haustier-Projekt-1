@@ -17,9 +17,7 @@ const BACKUP_KEY = 'fabelgarten.save.backup';
 export function storageAvailable() {
   try {
     const probe = '__fg_test__';
-    const start = Date.now();
     localStorage.setItem(probe, '1');
-    if (Date.now() - start > 500) return false; // Zu langsam = kaputt
     localStorage.removeItem(probe);
     return true;
   } catch {

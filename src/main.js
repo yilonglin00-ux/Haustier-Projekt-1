@@ -58,13 +58,19 @@ function boot() {
   applyTheme(save.einstellungen.theme);
   applyMotion(save.einstellungen.bewegung);
 
-  // 2. Kritische Systeme (schnell) ----------------------------------------
+  // 2. Systeme ------------------------------------------------------------
+  // Alle Systeme müssen angemeldet sein, bevor `catchUp()` die Abwesenheit
+  // nachrechnet — dabei schlüpfen Eier, enden Expeditionen und fallen Erfolge
+  // an. Wer erst danach zuhört, verpasst genau diese Ereignisse.
   onTick(tickPets);
   installDayWatcher();
   installPlaytimeTracker();
   installEggSystem();
   installExpeditionSystem();
   installQuestSystem();
+  installAchievementSystem();
+  installRareEvents();
+  installGardenHarvest();
   installAudio();
   installAutosave(subscribe);
 
@@ -72,13 +78,6 @@ function boot() {
   mountApp();
   installResponsiveNav();
   navigate(getState().flags.starterGewaehlt ? 'zuhause' : 'starter');
-
-  // 4. Nicht-kritische Systeme asynchron (nach UI-Mount)
-  Promise.resolve().then(() => {
-    installAchievementSystem();
-    installRareEvents();
-    installGardenHarvest();
-  });
 
   // 4. Abwesenheit nachrechnen und loslaufen -------------------------------
   const abwesenheit = catchUp();
@@ -99,17 +98,6 @@ function boot() {
     }
   }
 }
-
-// Safety timeout: Falls boot() irgendwo hängenbleibt, den Ladebildschirm nach 10s entfernen
-setTimeout(() => {
-  const boot = document.querySelector('#boot');
-  const app = document.querySelector('#app');
-  if (boot && boot.style.display !== 'none') {
-    boot.style.display = 'none';
-    if (app) app.hidden = false;
-    console.warn('Boot timeout reached — forcing UI visible');
-  }
-}, 10000);
 
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', boot);
