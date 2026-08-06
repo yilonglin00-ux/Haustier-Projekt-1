@@ -12,7 +12,9 @@ bleibt in deinem Browser.
 
 ## Spielen
 
-`dist/index.html` herunterladen und im Browser öffnen — fertig. Die Datei
+**Online spielen:** https://yilonglin00-ux.github.io/Haustier-Projekt-1/
+
+Oder `dist/index.html` herunterladen und im Browser öffnen — fertig. Die Datei
 funktioniert auch offline und per Doppelklick, ohne Webserver.
 
 Zum Entwickeln:
