@@ -175,7 +175,12 @@ export function h(tag, props, ...children) {
       if (key === 'class' || key === 'className') {
         node.classList.add(...String(value).split(/\s+/).filter(Boolean));
       } else if (key === 'style' && typeof value === 'object') {
-        Object.assign(node.style, value);
+        // Eigene CSS-Variablen (--foo) lassen sich nicht über Object.assign
+        // setzen — dafür braucht es setProperty().
+        for (const [prop, wert] of Object.entries(value)) {
+          if (prop.startsWith('--')) node.style.setProperty(prop, String(wert));
+          else node.style[prop] = wert;
+        }
       } else if (key === 'dataset') {
         Object.assign(node.dataset, value);
       } else if (key.startsWith('on') && typeof value === 'function') {

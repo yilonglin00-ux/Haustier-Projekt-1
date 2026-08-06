@@ -2,6 +2,19 @@
    layout.css — App-Gerüst, Navigation, Bildschirmraster, Responsivität
    ========================================================================== */
 
+/* --- Grundregel gegen waagerechtes Scrollen ------------------------------- */
+
+/*
+   Grid- und Flex-Kinder haben von sich aus `min-width: auto` und schrumpfen
+   deshalb nie unter ihren Inhalt. Ein einziges breites Element (eine
+   Navigationsbeschriftung, eine lange Zahl) würde so die ganze Seite über den
+   Bildschirmrand schieben. Diese Regel nimmt dem Layout genau diese Falle.
+*/
+.app,
+.app *:not(canvas):not(svg) {
+  min-width: 0;
+}
+
 .app {
   min-height: 100dvh;
   display: grid;
@@ -10,6 +23,9 @@
     'topbar'
     'screen'
     'nav';
+  /* Letzte Sicherung: nichts darf die Seite waagerecht aufziehen. */
+  overflow-x: clip;
+  max-width: 100%;
   background:
     radial-gradient(120% 80% at 12% -10%, var(--scene-sky-2) 0%, transparent 55%),
     radial-gradient(100% 70% at 90% 0%, var(--scene-sky-1) 0%, transparent 50%),
@@ -41,10 +57,19 @@
   font-weight: 700;
   letter-spacing: -0.02em;
   white-space: nowrap;
+  overflow: hidden;
 }
 
 .topbar__brand span[aria-hidden] {
   font-size: 1.3rem;
+  flex: none;
+}
+
+/* Auf sehr schmalen Geräten bleibt nur das Zeichen — der Platz gehört den Werten. */
+@media (max-width: 380px) {
+  .topbar__brand span:not([aria-hidden]) {
+    display: none;
+  }
 }
 
 .topbar__spacer {
@@ -54,6 +79,7 @@
 .topbar__wallet {
   display: flex;
   gap: var(--sp-2);
+  flex: none;
 }
 
 /* --- Bildschirmfläche ----------------------------------------------------- */
@@ -65,6 +91,7 @@
   margin-inline: auto;
   padding: var(--sp-4);
   padding-bottom: var(--sp-6);
+  padding-inline: max(var(--sp-4), env(safe-area-inset-left), env(safe-area-inset-right));
   display: flex;
   flex-direction: column;
   gap: var(--sp-4);
@@ -102,18 +129,30 @@
 }
 
 .nav__item {
-  flex: 1;
+  flex: 1 1 0;
+  min-width: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   gap: 2px;
-  padding: var(--sp-2) var(--sp-1);
+  /* Mindestens 44 px hoch: bequem mit dem Daumen zu treffen. */
+  min-height: 48px;
+  padding: var(--sp-2) 2px;
   border-radius: var(--r-md);
   color: var(--text-faint);
   font-size: 0.68rem;
   font-weight: 600;
   transition: color var(--t-fast), background var(--t-fast), transform var(--t-fast);
   position: relative;
+}
+
+/* Beschriftungen kürzen statt die Leiste zu verbreitern. */
+.nav__item > span:not(.nav__icon):not(.nav__badge) {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .nav__item:hover {
@@ -209,16 +248,20 @@
   gap: var(--sp-3);
 }
 
+/*
+   `min(… , 100%)` statt einer festen Mindestbreite: dadurch kippt das Raster
+   auf schmalen Geräten sauber auf eine Spalte, statt über den Rand zu laufen.
+*/
 .grid--auto {
-  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(150px, 100%), 1fr));
 }
 
 .grid--wide {
-  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(230px, 100%), 1fr));
 }
 
 .grid--tiles {
-  grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(96px, 100%), 1fr));
 }
 
 .row {
@@ -266,6 +309,45 @@
     gap: var(--sp-4);
     align-items: start;
   }
+}
+
+/* --- Tablet-Zwischenstufe -------------------------------------------------- */
+
+@media (min-width: 640px) and (max-width: 899px) {
+  .screen {
+    padding: var(--sp-5);
+  }
+
+  /* Auf dem Tablet passen Bedürfnisse und Gefühle nebeneinander. */
+  .home-layout > .col:last-child {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--sp-3);
+    align-items: start;
+  }
+
+  .stage {
+    min-height: clamp(300px, 38dvh, 420px);
+  }
+}
+
+/* --- Waagerecht scrollende Behälter --------------------------------------- */
+
+/*
+   Alles, was breiter werden darf als der Bildschirm, scrollt in sich selbst.
+   Die Seite bleibt dadurch immer genau so breit wie das Fenster.
+*/
+.scroll-x {
+  overflow-x: auto;
+  overflow-y: hidden;
+  flex-wrap: nowrap;
+  scrollbar-width: thin;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 2px;
+}
+
+.scroll-x > * {
+  flex: none;
 }
 
 @keyframes screen-in {

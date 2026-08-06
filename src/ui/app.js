@@ -107,9 +107,13 @@ function buildNav() {
   const screens = navScreens();
   const active = currentScreenId();
 
-  // Auf dem Smartphone zeigt die Bodenleiste nur die wichtigsten Ziele
-  // plus einen „Mehr“-Knopf, der den Rest als Blatt öffnet.
-  const visible = isDesktop ? screens : screens.filter((s) => s.primary || s.id === active);
+  /*
+     Auf dem Smartphone zeigt die Bodenleiste höchstens vier Ziele plus einen
+     „Mehr“-Knopf. Mehr Einträge würden sich nicht mehr sinnvoll beschriften
+     lassen und die Leiste über den Bildschirmrand schieben.
+  */
+  const MAX_MOBIL = 4;
+  const visible = isDesktop ? screens : screens.filter((s) => s.primary).slice(0, MAX_MOBIL);
 
   const items = visible.map((screen) =>
     h(
@@ -118,6 +122,7 @@ function buildNav() {
         onclick: () => navigate(screen.id),
         'aria-current': screen.id === active ? 'page' : null,
         'data-screen': screen.id,
+        title: screen.label,
       },
       h('span.nav__icon', { 'aria-hidden': 'true' }, screen.icon),
       h('span', screen.label),
@@ -126,12 +131,23 @@ function buildNav() {
   );
 
   if (!isDesktop) {
+    // Liegt der aktuelle Bildschirm hinter „Mehr“, wird der Knopf hervorgehoben —
+    // sonst wüsste man nicht, wo man gerade ist.
+    const versteckt = !visible.some((screen) => screen.id === active);
+    const aktuell = versteckt ? getScreen(active) : null;
+
     items.push(
       h(
         'button.nav__item',
-        { onclick: openMoreSheet, 'aria-label': 'Weitere Bereiche' },
-        h('span.nav__icon', { 'aria-hidden': 'true' }, '⋯'),
-        h('span', 'Mehr')
+        {
+          onclick: openMoreSheet,
+          'aria-label': 'Weitere Bereiche',
+          'aria-current': versteckt ? 'page' : null,
+          title: 'Weitere Bereiche',
+        },
+        h('span.nav__icon', { 'aria-hidden': 'true' }, aktuell ? aktuell.icon : '⋯'),
+        h('span', aktuell ? aktuell.label : 'Mehr'),
+        offeneAbzeichen(visible)
       )
     );
   }
@@ -143,6 +159,19 @@ function badgeNode(screen) {
   const value = screen.badge?.();
   if (!value) return null;
   return h('span.nav__badge', String(value));
+}
+
+/**
+ * Sammelt die Abzeichen aller Bildschirme, die hinter „Mehr“ liegen.
+ * Ohne das bliebe eine schlupfbereite Ei-Meldung auf dem Smartphone unsichtbar.
+ */
+function offeneAbzeichen(sichtbar) {
+  const versteckt = navScreens().filter((screen) => !sichtbar.some((s) => s.id === screen.id));
+  const summe = versteckt.reduce((total, screen) => {
+    const wert = Number(screen.badge?.() || 0);
+    return total + (Number.isFinite(wert) ? wert : 0);
+  }, 0);
+  return summe ? h('span.nav__badge', String(summe)) : null;
 }
 
 function updateNavBadges() {

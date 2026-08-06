@@ -59,8 +59,49 @@ const RE_EXPORT_ANY = /^export\s/;
  * Liest ein Modul, ersetzt import/export durch die Laufzeit-Entsprechungen und
  * liefert Quelltext plus Liste der importierten Dateien zurück.
  */
+/**
+ * Fasst mehrzeilige Import-Anweisungen zu einer Zeile zusammen.
+ *
+ *   import {
+ *     a,
+ *     b,
+ *   } from './x.js';
+ *
+ * wird zu `import { a, b } from './x.js';`. Die entfallenden Zeilen bleiben als
+ * Leerzeilen stehen, damit Zeilennummern in Fehlermeldungen weiter stimmen.
+ */
+function normalizeImports(source) {
+  const lines = source.split('\n');
+  const out = [];
+
+  for (let i = 0; i < lines.length; i += 1) {
+    const line = lines[i];
+    const beginnt = /^import\s/.test(line);
+    const vollstaendig = /from\s+['"][^'"]+['"];?\s*$/.test(line) || /^import\s+['"][^'"]+['"];?\s*$/.test(line);
+
+    if (!beginnt || vollstaendig) {
+      out.push(line);
+      continue;
+    }
+
+    // Zeilen sammeln, bis die Anweisung abgeschlossen ist.
+    const teile = [line];
+    let j = i;
+    while (j + 1 < lines.length && !/from\s+['"][^'"]+['"];?\s*$/.test(lines[j])) {
+      j += 1;
+      teile.push(lines[j]);
+    }
+
+    out.push(teile.join(' ').replace(/\s+/g, ' ').trim());
+    for (let k = i + 1; k <= j; k += 1) out.push('');
+    i = j;
+  }
+
+  return out.join('\n');
+}
+
 function transformModule(absPath) {
-  const source = readFileSync(absPath, 'utf8');
+  const source = normalizeImports(readFileSync(absPath, 'utf8'));
   const dir = dirname(absPath);
   const deps = [];
   const exportedNames = new Set();

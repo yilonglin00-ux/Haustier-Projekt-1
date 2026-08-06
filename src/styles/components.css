@@ -112,6 +112,31 @@
   font-size: 0.82rem;
 }
 
+/*
+   Auf Geräten ohne Maus bekommt jedes Bedienelement mindestens 44 px Höhe —
+   die Größe, die sich mit dem Daumen zuverlässig treffen lässt.
+*/
+@media (pointer: coarse) {
+  .btn,
+  .tab,
+  .list-item button,
+  .switch {
+    min-height: 44px;
+  }
+
+  .btn--icon {
+    min-width: 44px;
+  }
+
+  .action {
+    min-height: 72px;
+  }
+
+  .tile {
+    min-height: 64px;
+  }
+}
+
 .btn--icon {
   padding: 0.5rem;
   aspect-ratio: 1;
@@ -360,6 +385,15 @@
   display: flex;
   align-items: center;
   gap: 4px;
+  /* Lange Namen kürzen, statt sie aus der Karte laufen zu lassen. */
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.pet-card__name > * {
+  flex: none;
 }
 
 .pet-card__meta {

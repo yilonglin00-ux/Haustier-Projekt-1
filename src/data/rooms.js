@@ -3,7 +3,10 @@
  *
  * Räume kosten einmalig Münzen und schalten einen dauerhaften Vorteil frei.
  * Möbel sind zusätzlich kaufbar und verstärken den Raum-Bonus weiter.
- * Alle Boni sind Faktoren oder Prozentwerte und werden in `systems/` gelesen.
+ *
+ * Alle Boni sind **additive Zuschläge auf 1** und werden überall gleich
+ * gelesen: `1 + (boni.schluessel || 0)`. `fruchtErnte` und `brutplatz` sind
+ * die Ausnahme — sie zählen Stückzahlen, keine Faktoren.
  */
 
 export const ROOMS = {
@@ -13,7 +16,7 @@ export const ROOMS = {
     icon: '🛏️',
     preis: 0,
     text: 'Wo alles anfängt: ein warmer Platz zum Schlafen.',
-    bonus: { schlafErholung: 1.0 },
+    bonus: { schlafErholung: 0.1 },
     bonusText: 'Grundlage für erholsamen Schlaf.',
   },
   kueche: {
@@ -22,7 +25,7 @@ export const ROOMS = {
     icon: '🍳',
     preis: 600,
     text: 'Selbst gekocht schmeckt jedem Haustier besser.',
-    bonus: { futterWirkung: 1.25, ladenRabatt: 0.1 },
+    bonus: { futterWirkung: 0.25, ladenRabatt: 0.1 },
     bonusText: 'Futter wirkt 25 % stärker, Laden 10 % günstiger.',
   },
   garten: {
@@ -40,7 +43,7 @@ export const ROOMS = {
     icon: '🏋️',
     preis: 2200,
     text: 'Geräte, Matten und ein sehr geduldiger Sandsack.',
-    bonus: { trainingXp: 1.35, attributChance: 0.15 },
+    bonus: { trainingXp: 0.35, attributChance: 0.15 },
     bonusText: 'Training gibt 35 % mehr Erfahrung.',
   },
   labor: {
@@ -49,7 +52,7 @@ export const ROOMS = {
     icon: '🔬',
     preis: 3600,
     text: 'Brutkästen, Messgeräte und beunruhigend viele Notizen.',
-    bonus: { brutzeit: 0.75, brutplatz: 1 },
+    bonus: { brutzeit: -0.25, brutplatz: 1 },
     bonusText: 'Brutzeit −25 %, ein zusätzlicher Brutplatz.',
   },
   aquarium: {
@@ -58,7 +61,7 @@ export const ROOMS = {
     icon: '🐠',
     preis: 5200,
     text: 'Ein ganzes Riff im Wohnzimmer. Beruhigt alle Bewohner.',
-    bonus: { stimmungRegen: 1.4, wasserBonus: 1.2 },
+    bonus: { stimmungRegen: 0.4, wasserBonus: 0.2 },
     bonusText: 'Stimmung sinkt langsamer, Wasser-Haustiere blühen auf.',
   },
 };

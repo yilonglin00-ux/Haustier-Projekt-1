@@ -7,7 +7,9 @@
   "scripts": {
     "dev": "node serve.js",
     "build": "node build.js",
-    "check": "node build.js --check"
+    "check": "node build.js --check",
+    "test": "node tools/speichertest.mjs && node tools/spieltest.mjs",
+    "kontaktbogen": "node tools/kontaktbogen.js"
   },
   "keywords": ["spiel", "haustier", "browser", "offline", "sammelspiel"],
   "license": "MIT"
