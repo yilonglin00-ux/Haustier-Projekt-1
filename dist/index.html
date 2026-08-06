@@ -13505,6 +13505,7 @@ function tripCard(reise) {
                 'button.btn.btn--sm.btn--ghost',
                 {
                   title: 'Abbrechen (ohne Beute)',
+                  'aria-label': 'Expedition abbrechen',
                   onclick: async () => {
                     const sicher = await confirmDialog({
                       title: 'Expedition abbrechen?',
@@ -14626,6 +14627,7 @@ function eggCard(ei, vorschau) {
                   refresh();
                 },
                 title: 'Wärmestein benutzen',
+                'aria-label': 'Wärmestein benutzen — zwei Stunden schneller',
               },
               '🔆'
             )

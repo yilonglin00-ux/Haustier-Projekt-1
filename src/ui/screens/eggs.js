@@ -136,6 +136,7 @@ function eggCard(ei, vorschau) {
                   refresh();
                 },
                 title: 'Wärmestein benutzen',
+                'aria-label': 'Wärmestein benutzen — zwei Stunden schneller',
               },
               '🔆'
             )

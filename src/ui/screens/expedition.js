@@ -96,6 +96,7 @@ function tripCard(reise) {
                 'button.btn.btn--sm.btn--ghost',
                 {
                   title: 'Abbrechen (ohne Beute)',
+                  'aria-label': 'Expedition abbrechen',
                   onclick: async () => {
                     const sicher = await confirmDialog({
                       title: 'Expedition abbrechen?',
