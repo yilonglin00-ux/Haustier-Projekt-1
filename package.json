@@ -1,0 +1,16 @@
+{
+  "name": "haustier-projekt",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Virtuelles Haustier-Spiel — ein Browser-Sammelspiel ohne Installation, Server oder Anmeldung.",
+  "type": "module",
+  "scripts": {
+    "dev": "node serve.js",
+    "build": "node build.js",
+    "check": "node build.js --check",
+    "test": "node tools/speichertest.mjs && node tools/spieltest.mjs",
+    "kontaktbogen": "node tools/kontaktbogen.js"
+  },
+  "keywords": ["spiel", "haustier", "browser", "offline", "sammelspiel"],
+  "license": "MIT"
+}

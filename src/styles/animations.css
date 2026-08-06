@@ -1,0 +1,520 @@
+/* ==========================================================================
+   animations.css — Keyframes und Haustier-Animationszustände
+   ==========================================================================
+   Die Sprites (prozedural wie handgezeichnet) liefern immer dieselben
+   Gruppen-Klassen: .pet-root, .pet-body, .pet-head, .pet-eye, .pet-tail,
+   .pet-ear, .pet-wing, .pet-aura. Dadurch gelten diese Animationen für
+   jede Kreatur, unabhängig von ihrer Herkunft.
+   ========================================================================== */
+
+/* --- Allgemeine Keyframes ------------------------------------------------- */
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes modal-in {
+  from {
+    opacity: 0;
+    transform: translateY(18px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(14px) scale(0.94);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes toast-out {
+  to {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.96);
+  }
+}
+
+@keyframes float-up {
+  0% {
+    opacity: 0;
+    transform: translateY(0) scale(0.7);
+  }
+  18% {
+    opacity: 1;
+    transform: translateY(-10px) scale(1.12);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-72px) scale(1);
+  }
+}
+
+@keyframes particle-burst {
+  0% {
+    opacity: 1;
+    transform: translate(0, 0) scale(0.5) rotate(0deg);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(var(--dx, 0), var(--dy, -60px)) scale(1.15) rotate(var(--dr, 180deg));
+  }
+}
+
+@keyframes stat-warn {
+  0%,
+  100% {
+    filter: brightness(1);
+  }
+  50% {
+    filter: brightness(1.55);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -180% 0;
+  }
+  100% {
+    background-position: 180% 0;
+  }
+}
+
+@keyframes pop-in {
+  from {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes spin-slow {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* --- Grundbewegung des Sprites -------------------------------------------- */
+
+.pet-root {
+  transform-box: fill-box;
+  transform-origin: center bottom;
+}
+
+.sprite--animated .pet-root {
+  animation: pet-breathe 3.4s ease-in-out infinite;
+}
+
+@keyframes pet-breathe {
+  0%,
+  100% {
+    transform: scaleY(1) translateY(0);
+  }
+  50% {
+    transform: scaleY(1.035) translateY(-1.5%);
+  }
+}
+
+.sprite--animated .pet-tail {
+  transform-box: fill-box;
+  transform-origin: left center;
+  animation: pet-tail 2.1s ease-in-out infinite;
+}
+
+@keyframes pet-tail {
+  0%,
+  100% {
+    transform: rotate(-7deg);
+  }
+  50% {
+    transform: rotate(9deg);
+  }
+}
+
+.sprite--animated .pet-ear {
+  transform-box: fill-box;
+  transform-origin: center bottom;
+  animation: pet-ear 4.2s ease-in-out infinite;
+}
+
+@keyframes pet-ear {
+  0%,
+  92%,
+  100% {
+    transform: rotate(0deg);
+  }
+  95% {
+    transform: rotate(-8deg);
+  }
+}
+
+.sprite--animated .pet-eye {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: pet-blink 5.2s ease-in-out infinite;
+}
+
+@keyframes pet-blink {
+  0%,
+  94%,
+  100% {
+    transform: scaleY(1);
+  }
+  96% {
+    transform: scaleY(0.08);
+  }
+}
+
+.sprite--animated .pet-wing {
+  transform-box: fill-box;
+  transform-origin: right center;
+  animation: pet-wing 1.5s ease-in-out infinite;
+}
+
+@keyframes pet-wing {
+  0%,
+  100% {
+    transform: rotate(0deg) scaleX(1);
+  }
+  50% {
+    transform: rotate(-16deg) scaleX(0.88);
+  }
+}
+
+.pet-aura {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: pet-aura 4s ease-in-out infinite;
+}
+
+@keyframes pet-aura {
+  0%,
+  100% {
+    opacity: 0.35;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.7;
+    transform: scale(1.07);
+  }
+}
+
+.pet-orbit {
+  transform-box: view-box;
+  transform-origin: 50% 50%;
+  animation: spin-slow 9s linear infinite;
+}
+
+.pet-float {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: pet-float 3s ease-in-out infinite;
+}
+
+@keyframes pet-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-4%);
+  }
+}
+
+/* --- Zustände ------------------------------------------------------------- */
+
+.sprite[data-mood='schlafend'] .pet-root {
+  animation: pet-sleep 4.2s ease-in-out infinite;
+}
+
+.sprite[data-mood='schlafend'] .pet-eye {
+  animation: none;
+  transform: scaleY(0.1);
+}
+
+@keyframes pet-sleep {
+  0%,
+  100% {
+    transform: scale(1, 0.98) translateY(1%) rotate(-1deg);
+  }
+  50% {
+    transform: scale(1.02, 1.01) translateY(-0.5%) rotate(1deg);
+  }
+}
+
+.sprite[data-mood='krank'] .pet-root {
+  filter: saturate(0.5) brightness(0.88);
+  animation: pet-sick 2.4s ease-in-out infinite;
+}
+
+@keyframes pet-sick {
+  0%,
+  100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  25% {
+    transform: translateY(1.5%) rotate(-1.5deg);
+  }
+  75% {
+    transform: translateY(1.5%) rotate(1.5deg);
+  }
+}
+
+.sprite[data-mood='traurig'] .pet-root {
+  animation: pet-sad 3.6s ease-in-out infinite;
+}
+
+@keyframes pet-sad {
+  0%,
+  100% {
+    transform: translateY(2%) scaleY(0.97);
+  }
+  50% {
+    transform: translateY(3%) scaleY(0.95);
+  }
+}
+
+.sprite[data-mood='begeistert'] .pet-root {
+  animation: pet-hop 0.85s var(--ease-spring) infinite;
+}
+
+@keyframes pet-hop {
+  0%,
+  100% {
+    transform: translateY(0) scaleY(1);
+  }
+  30% {
+    transform: translateY(-9%) scaleY(1.05);
+  }
+  55% {
+    transform: translateY(0) scaleY(0.94);
+  }
+}
+
+/* --- Einmalige Aktions-Animationen ---------------------------------------- */
+
+.sprite--act-essen .pet-root {
+  animation: act-eat 0.75s ease-in-out 2;
+}
+
+@keyframes act-eat {
+  0%,
+  100% {
+    transform: translateY(0) rotate(0);
+  }
+  40% {
+    transform: translateY(3%) rotate(-4deg) scaleY(0.94);
+  }
+  70% {
+    transform: translateY(0) rotate(3deg);
+  }
+}
+
+.sprite--act-spielen .pet-root {
+  animation: act-play 0.6s var(--ease-spring) 3;
+}
+
+@keyframes act-play {
+  0%,
+  100% {
+    transform: translateY(0) rotate(0);
+  }
+  25% {
+    transform: translateY(-14%) rotate(-9deg);
+  }
+  60% {
+    transform: translateY(-4%) rotate(8deg);
+  }
+}
+
+.sprite--act-streicheln .pet-root {
+  animation: act-pet 0.9s ease-in-out 2;
+}
+
+@keyframes act-pet {
+  0%,
+  100% {
+    transform: rotate(0) scale(1);
+  }
+  30% {
+    transform: rotate(-5deg) scale(1.04);
+  }
+  65% {
+    transform: rotate(5deg) scale(1.04);
+  }
+}
+
+.sprite--act-training .pet-root {
+  animation: act-train 0.45s ease-in-out 4;
+}
+
+@keyframes act-train {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  30% {
+    transform: translateX(-5%) scaleX(1.03);
+  }
+  70% {
+    transform: translateX(5%) scaleX(0.97);
+  }
+}
+
+.sprite--act-baden .pet-root {
+  animation: act-bath 0.7s ease-in-out 3;
+}
+
+@keyframes act-bath {
+  0%,
+  100% {
+    transform: rotate(0);
+  }
+  25% {
+    transform: rotate(-12deg);
+  }
+  75% {
+    transform: rotate(12deg);
+  }
+}
+
+/* --- Entwicklung ---------------------------------------------------------- */
+
+.evolve-stage {
+  position: relative;
+  display: grid;
+  place-items: center;
+  min-height: 240px;
+}
+
+.evolve-stage .sprite {
+  width: 200px;
+  height: 200px;
+}
+
+.evolve-stage--flash .sprite {
+  animation: evolve-flash 2.6s ease-in-out forwards;
+}
+
+@keyframes evolve-flash {
+  0% {
+    filter: brightness(1);
+    transform: scale(1);
+  }
+  20% {
+    filter: brightness(2.5) saturate(0);
+    transform: scale(1.06);
+  }
+  40% {
+    filter: brightness(1.2) saturate(0.4);
+    transform: scale(0.96);
+  }
+  60% {
+    filter: brightness(3) saturate(0);
+    transform: scale(1.1);
+  }
+  100% {
+    filter: brightness(1);
+    transform: scale(1);
+  }
+}
+
+.evolve-rays {
+  position: absolute;
+  inset: 0;
+  background: conic-gradient(
+    from 0deg,
+    transparent 0deg 12deg,
+    color-mix(in srgb, var(--accent) 55%, transparent) 14deg 18deg,
+    transparent 20deg 32deg
+  );
+  border-radius: 50%;
+  animation: spin-slow 6s linear infinite;
+  opacity: 0.6;
+  mask-image: radial-gradient(circle, transparent 28%, #000 70%);
+}
+
+/* --- Ei-Animationen ------------------------------------------------------- */
+
+.egg-shake {
+  animation: egg-shake 2.6s ease-in-out infinite;
+  transform-origin: center bottom;
+}
+
+@keyframes egg-shake {
+  0%,
+  70%,
+  100% {
+    transform: rotate(0);
+  }
+  75% {
+    transform: rotate(-9deg);
+  }
+  80% {
+    transform: rotate(8deg);
+  }
+  85% {
+    transform: rotate(-6deg);
+  }
+  90% {
+    transform: rotate(4deg);
+  }
+}
+
+/* --- Glanz-Effekt für seltene Karten -------------------------------------- */
+
+.shine {
+  position: relative;
+  overflow: hidden;
+}
+
+.shine::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    110deg,
+    transparent 35%,
+    rgb(255 255 255 / 0.35) 48%,
+    transparent 62%
+  );
+  background-size: 220% 100%;
+  animation: shimmer 3.4s ease-in-out infinite;
+  pointer-events: none;
+}
+
+/* --- Reduzierte Bewegung -------------------------------------------------- */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
+
+/* Manuell in den Einstellungen abschaltbar */
+html[data-motion='reduced'] *,
+html[data-motion='reduced'] *::before,
+html[data-motion='reduced'] *::after {
+  animation-duration: 0.001ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.001ms !important;
+}

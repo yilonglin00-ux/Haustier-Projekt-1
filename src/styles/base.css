@@ -1,0 +1,302 @@
+/* ==========================================================================
+   base.css — Reset, Design-Tokens, Themes, Grundtypografie
+   ========================================================================== */
+
+/* --- Reset ---------------------------------------------------------------- */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+* {
+  margin: 0;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  color: var(--text);
+  background: var(--bg);
+  overscroll-behavior: none;
+}
+
+img,
+svg,
+canvas {
+  display: block;
+  max-width: 100%;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+  color: inherit;
+}
+
+button {
+  cursor: pointer;
+  border: none;
+  background: none;
+}
+
+:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+/* --- Design-Tokens -------------------------------------------------------- */
+
+:root {
+  --font-body: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+  --font-display: 'Trebuchet MS', 'Segoe UI', system-ui, sans-serif;
+  --font-mono: ui-monospace, 'SF Mono', 'Cascadia Mono', Menlo, monospace;
+
+  /* Abstände (4-px-Raster) */
+  --sp-1: 0.25rem;
+  --sp-2: 0.5rem;
+  --sp-3: 0.75rem;
+  --sp-4: 1rem;
+  --sp-5: 1.5rem;
+  --sp-6: 2rem;
+  --sp-7: 3rem;
+
+  /* Radien */
+  --r-sm: 8px;
+  --r-md: 14px;
+  --r-lg: 20px;
+  --r-xl: 28px;
+  --r-pill: 999px;
+
+  /* Bewegung */
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --t-fast: 140ms;
+  --t-med: 260ms;
+  --t-slow: 460ms;
+
+  /* Element-Farben (themeunabhängig, sie sind Teil der Spielidentität) */
+  --el-feuer: #ff7a45;
+  --el-wasser: #38b6ff;
+  --el-natur: #4cc38a;
+  --el-blitz: #ffc93c;
+  --el-eis: #7fd8e8;
+  --el-schatten: #8b6bd9;
+  --el-licht: #ffd98e;
+  --el-gestein: #b08968;
+  --el-wind: #9ad9c8;
+  --el-metall: #a9b4c2;
+  --el-geist: #d67ab1;
+  --el-kristall: #7ae5d0;
+
+  /* Seltenheits-Farben */
+  --ra-gewoehnlich: #b6bfcc;
+  --ra-ungewoehnlich: #55c57a;
+  --ra-selten: #4aa8ff;
+  --ra-episch: #b072f5;
+  --ra-legendaer: #ffc03a;
+  --ra-mystisch: #ff5a7a;
+
+  /* Bedürfnis-Farben */
+  --stat-gesundheit: #ff6b7d;
+  --stat-energie: #ffc93c;
+  --stat-hunger: #ffa552;
+  --stat-durst: #4aa8ff;
+  --stat-sauberkeit: #7ae5d0;
+  --stat-stimmung: #ff8fc7;
+
+  --shadow-sm: 0 1px 2px rgb(0 0 0 / 0.14);
+  --shadow-md: 0 6px 18px -6px rgb(0 0 0 / 0.28);
+  --shadow-lg: 0 20px 48px -20px rgb(0 0 0 / 0.45);
+}
+
+/* --- Dunkles Theme (Standard) --------------------------------------------- */
+
+:root,
+:root[data-theme='dark'] {
+  --bg: #0e1220;
+  --bg-deep: #070a14;
+  --surface: #171d31;
+  --surface-2: #1f2740;
+  --surface-3: #2a3350;
+  --border: #2e3859;
+  --border-soft: #232c47;
+
+  --text: #eaeefb;
+  --text-dim: #a7b1cd;
+  --text-faint: #6f7a99;
+
+  --brand: #7c8cff;
+  --brand-strong: #9aa6ff;
+  --brand-ink: #0e1220;
+  --accent: #ffc93c;
+
+  --good: #4cc38a;
+  --warn: #ffb020;
+  --bad: #ff6b7d;
+
+  --focus: #9aa6ff;
+
+  --scene-sky-1: #1b2144;
+  --scene-sky-2: #2a2d5c;
+  --scene-ground: #1d2a3f;
+  --glass: rgb(255 255 255 / 0.06);
+  --glass-line: rgb(255 255 255 / 0.09);
+}
+
+/* --- Helles Theme --------------------------------------------------------- */
+
+:root[data-theme='light'] {
+  --bg: #f3f5fb;
+  --bg-deep: #e7ebf6;
+  --surface: #ffffff;
+  --surface-2: #f5f7fd;
+  --surface-3: #e9eefa;
+  --border: #d7deee;
+  --border-soft: #e6ebf7;
+
+  --text: #182034;
+  --text-dim: #55617e;
+  --text-faint: #8b95af;
+
+  --brand: #5566f0;
+  --brand-strong: #4353e0;
+  --brand-ink: #ffffff;
+  --accent: #f0a416;
+
+  --good: #22a06b;
+  --warn: #d98200;
+  --bad: #e0455c;
+
+  --focus: #4353e0;
+
+  --scene-sky-1: #cfe3ff;
+  --scene-sky-2: #eadcff;
+  --scene-ground: #d5ecd8;
+  --glass: rgb(18 24 40 / 0.04);
+  --glass-line: rgb(18 24 40 / 0.08);
+
+  --shadow-md: 0 6px 18px -8px rgb(30 45 90 / 0.22);
+  --shadow-lg: 0 20px 48px -22px rgb(30 45 90 / 0.32);
+}
+
+/* --- Typografie ----------------------------------------------------------- */
+
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--font-display);
+  line-height: 1.2;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+h1 {
+  font-size: clamp(1.5rem, 1.1rem + 1.6vw, 2.1rem);
+}
+h2 {
+  font-size: clamp(1.2rem, 1rem + 0.9vw, 1.55rem);
+}
+h3 {
+  font-size: 1.05rem;
+}
+
+p {
+  text-wrap: pretty;
+}
+
+.muted {
+  color: var(--text-dim);
+}
+.faint {
+  color: var(--text-faint);
+}
+.tiny {
+  font-size: 0.78rem;
+}
+.small {
+  font-size: 0.86rem;
+}
+.center {
+  text-align: center;
+}
+.mono {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* --- Ladebildschirm ------------------------------------------------------- */
+
+.boot {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: var(--sp-4);
+  background: var(--bg);
+  z-index: 100;
+}
+
+.boot__mark {
+  font-size: 3.5rem;
+  animation: boot-pulse 1.4s var(--ease-out) infinite;
+}
+
+.boot__text {
+  color: var(--text-dim);
+}
+
+@keyframes boot-pulse {
+  0%,
+  100% {
+    transform: scale(1) rotate(-4deg);
+    opacity: 0.7;
+  }
+  50% {
+    transform: scale(1.14) rotate(4deg);
+    opacity: 1;
+  }
+}
+
+/* --- Scrollbars ----------------------------------------------------------- */
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
+}
+
+*::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+*::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: var(--r-pill);
+  border: 3px solid transparent;
+  background-clip: content-box;
+}
