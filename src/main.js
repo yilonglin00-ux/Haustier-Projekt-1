@@ -96,6 +96,17 @@ function boot() {
   }
 }
 
+// Safety timeout: Falls boot() irgendwo hängenbleibt, den Ladebildschirm nach 10s entfernen
+setTimeout(() => {
+  const boot = document.querySelector('#boot');
+  const app = document.querySelector('#app');
+  if (boot && boot.style.display !== 'none') {
+    boot.style.display = 'none';
+    if (app) app.hidden = false;
+    console.warn('Boot timeout reached — forcing UI visible');
+  }
+}, 10000);
+
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', boot);
 } else {
