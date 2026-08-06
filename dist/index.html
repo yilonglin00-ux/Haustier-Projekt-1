@@ -102,16 +102,13 @@ function boot() {
   applyTheme(save.einstellungen.theme);
   applyMotion(save.einstellungen.bewegung);
 
-  // 2. Systeme ------------------------------------------------------------
+  // 2. Kritische Systeme (schnell) ----------------------------------------
   onTick(tickPets);
   installDayWatcher();
   installPlaytimeTracker();
   installEggSystem();
   installExpeditionSystem();
   installQuestSystem();
-  installAchievementSystem();
-  installRareEvents();
-  installGardenHarvest();
   installAudio();
   installAutosave(subscribe);
 
@@ -119,6 +116,13 @@ function boot() {
   mountApp();
   installResponsiveNav();
   navigate(getState().flags.starterGewaehlt ? 'zuhause' : 'starter');
+
+  // 4. Nicht-kritische Systeme asynchron (nach UI-Mount)
+  Promise.resolve().then(() => {
+    installAchievementSystem();
+    installRareEvents();
+    installGardenHarvest();
+  });
 
   // 4. Abwesenheit nachrechnen und loslaufen -------------------------------
   const abwesenheit = catchUp();
